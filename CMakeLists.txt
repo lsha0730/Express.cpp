@@ -11,6 +11,7 @@ project(flash
 include(CTest)
 enable_testing()
 add_subdirectory(third_party/googletest)
+add_subdirectory(third_party/cpr)
 
 # Find all source files automatically
 file(GLOB_RECURSE FLASH_SOURCES 
