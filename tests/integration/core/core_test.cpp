@@ -1,15 +1,18 @@
 #include "core/core.h"
 #include <cpr/cpr.h>
+#include <format>
 #include <gtest/gtest.h>
 
-TEST(CoreTest, ReceivesRequest) {
+TEST(CoreTest, ReceivesRequestPost) {
   flash::Flash app = flash::Flash();
+  int port = 1234;
   std::string temp;
-  app.post("/test", [&temp](std::string req, std::string res) { temp = req; });
+  app.get("/test", [&temp](std::string req, std::string res) { temp = req; });
 
-  std::thread server_thread([&app]() {
-    app.listen(1234, [&app]() {
-      auto response = cpr::Post(cpr::Url{"http://localhost:1234/test"});
+  std::thread server_thread([&app, port]() {
+    app.listen(port, [&app, port]() {
+      std::string url = "http://localhost:" + std::to_string(port) + "/test";
+      auto response = cpr::Get(cpr::Url{url});
       app.shutdown();
     });
   });

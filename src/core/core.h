@@ -12,7 +12,11 @@ public:
 
   Flash();
   void listen(int port, Callback callback = Callback());
-  void post(std::string route, Handler callback);
+  // TODO
+  // void del(std::string route, Handler callback);
+  void get(std::string route, Handler callback);
+  // void post(std::string route, Handler callback);
+  // void put(std::string route, Handler callback);
   void shutdown();
 };
 } // namespace flash
