@@ -2,7 +2,10 @@
 #define Server_h
 
 #include <stdio.h>
+#include <unistd.h>
+#include <vector>
 
+#include "../../utils/constants.h"
 #include "../flash_networking.h"
 
 namespace flash {
@@ -14,8 +17,13 @@ public:
   ListeningSocket *socket();
 
 private:
+  static constexpr size_t CHUNK_SIZE_ = 8 * constants::KB_;
+
   ListeningSocket *socket_;
-  virtual void accepter() = 0;
+  int new_socket_;
+  std::vector<char> buffer_;
+
+  void accepter();
   virtual void handler() = 0;
   virtual void responder() = 0;
 };
