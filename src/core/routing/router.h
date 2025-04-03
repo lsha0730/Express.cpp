@@ -13,7 +13,7 @@ class Router {
 public:
   Router();
   // Execute incoming request
-  void run(Request request);
+  Response run(Request request);
 
   // Handler registration functions
   void del(std::string route, Handler handler);

@@ -1,9 +1,9 @@
 #include "server.h"
 
-flash::Server::Server(int domain, int service, int protocol, int port,
-                      u_long interface, int backlog) {
-  socket_ =
-      new ListeningSocket(domain, service, protocol, port, interface, backlog);
+flash::Server::Server(ServerConfig config, Router router) {
+  socket_ = new ListeningSocket(config.domain, config.service, config.protocol,
+                                config.port, config.interface, config.backlog);
+  router_ = router;
 }
 
 void flash::Server::accepter() {
@@ -30,4 +30,26 @@ void flash::Server::accepter() {
   }
 }
 
+flash::Response flash::Server::handler() {
+  std::string raw_request = std::string(buffer_.begin(), buffer_.end());
+  Request request = raw_request; // TODO: Add parsing step here
+  Response response = router_.run(request);
+  return response;
+}
+
+void flash::Server::responder(Response response) {
+  std::string_view response_string =
+      response; // TODO: Add deconstruction step here
+  write(new_socket_, response.data(), response.size());
+  close(new_socket_);
+}
+
 flash::ListeningSocket *flash::Server::socket() { return socket_; }
+
+void flash::Server::launch() {
+  while (true) {
+    accepter();
+    Response response = handler();
+    responder(response);
+  }
+}

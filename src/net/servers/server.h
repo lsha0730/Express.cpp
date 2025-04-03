@@ -5,15 +5,25 @@
 #include <unistd.h>
 #include <vector>
 
+#include "core/routing/router.h"
 #include "net/flash_networking.h"
 #include "utils/constants.h"
+#include "utils/types.h"
 
 namespace flash {
+struct ServerConfig { // TODO: Put in lower level as SocketConfig
+  int domain;
+  int service;
+  int protocol;
+  int port;
+  u_long interface;
+  int backlog;
+};
+
 class Server {
 public:
-  Server(int domain, int service, int protocol, int port, u_long interface,
-         int backlog);
-  virtual void launch() = 0;
+  Server(ServerConfig config, Router router);
+  void launch();
   ListeningSocket *socket();
 
 private:
@@ -22,10 +32,11 @@ private:
   ListeningSocket *socket_;
   int new_socket_;
   std::vector<char> buffer_;
+  Router router_;
 
   void accepter();
-  virtual void handler() = 0;
-  virtual void responder() = 0;
+  Response handler();
+  void responder(Response response);
 };
 }; // namespace flash
 
