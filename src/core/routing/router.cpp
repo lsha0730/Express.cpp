@@ -26,5 +26,7 @@ void flash::Router::use(std::string subroute, Router router) {
   subrouters_[subroute] = router;
 }
 
-// TODO
-void flash::Router::run(Request request) { std::cout << request << std::endl; }
+flash::Response flash::Router::run(Request request) {
+  // TODO: Replace mock implementation
+  return request;
+}
