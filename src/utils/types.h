@@ -7,6 +7,7 @@
 namespace flash {
 using Handler = std::function<void(std::string, std::string)>;
 using Callback = std::function<void()>;
+using Request = std::string; // TODO: Replace with proper struct
 
 } // namespace flash
 
