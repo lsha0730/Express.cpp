@@ -5,8 +5,8 @@
 #include <unistd.h>
 #include <vector>
 
-#include "../../utils/constants.h"
-#include "../flash_networking.h"
+#include "net/flash_networking.h"
+#include "utils/constants.h"
 
 namespace flash {
 class Server {
