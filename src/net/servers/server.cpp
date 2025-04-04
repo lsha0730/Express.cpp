@@ -59,21 +59,21 @@ void flash::Server::handle_connection() {
 flash::ListeningSocket *flash::Server::socket() { return socket_; }
 
 void flash::Server::launch() {
-  if (is_running_)
+  if (is_running)
     return;
-  is_running_ = true;
+  is_running = true;
   server_thread_ = std::thread(&Server::run, this);
 }
 
 void flash::Server::run() {
-  while (is_running_) {
+  while (is_running) {
     fd_set readfds;
     FD_ZERO(&readfds);
     FD_SET(socket_->sock(), &readfds);
 
     struct timeval tv;
     tv.tv_sec = 0;
-    tv.tv_usec = 100000; // 100ms timeout
+    tv.tv_usec = constants::DEFAULT_SELECT_TIMEOUT_US;
 
     int activity = select(socket_->sock() + 1, &readfds, NULL, NULL, &tv);
     bool got_new_connection = activity > 0;
@@ -85,9 +85,9 @@ void flash::Server::run() {
 }
 
 void flash::Server::stop() {
-  if (!is_running_)
+  if (!is_running)
     return;
-  is_running_ = false;
+  is_running = false;
 
   try {
     if (server_thread_.joinable()) {

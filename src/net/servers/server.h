@@ -26,6 +26,9 @@ public:
   Server(ServerConfig config, Router router);
   ~Server();
 
+  /** Flag indicating if server is running */
+  std::atomic<bool> is_running{false};
+
   /**
    * Starts the server to receive and handle requests, on a new thread.
    * Does nothing if the server is already running.
@@ -61,9 +64,6 @@ private:
 
   /** Thread running the server loop */
   std::thread server_thread_;
-
-  /** Flag indicating if server is running */
-  std::atomic<bool> is_running_{false};
 
   /**
    * Starts the server if it is marked as running.

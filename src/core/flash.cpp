@@ -16,14 +16,13 @@ public:
     flash::ServerConfig config = {DEFAULT_DOMAIN,    DEFAULT_SERVICE,
                                   DEFAULT_PROTOCOL,  port,
                                   DEFAULT_INTERFACE, DEFAULT_BACKLOG};
-    server = std::make_unique<Server>(config, *this);
-    server->launch();
+    server_ = std::make_unique<Server>(config, *this);
+    server_->launch();
     callback();
+    block_while_running();
   }
 
-  void shutdown() {
-    // TODO: Implementation
-  }
+  void shutdown() { server_ = nullptr; }
 
   void get(std::string route, Handler handler) {
     Router::get(route, std::move(handler));
@@ -42,7 +41,16 @@ public:
   }
 
 private:
-  std::unique_ptr<Server> server;
+  std::unique_ptr<Server> server_;
+  void block_while_running() {
+    while (server_->is_running) {
+      struct timeval tv;
+      tv.tv_sec = 0;
+      tv.tv_usec = constants::DEFAULT_SELECT_TIMEOUT_US;
+
+      select(0, NULL, NULL, NULL, &tv);
+    }
+  }
 };
 
 // Constructor
