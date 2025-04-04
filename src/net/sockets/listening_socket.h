@@ -8,8 +8,7 @@
 namespace flash {
 class ListeningSocket : public BindingSocket {
 public:
-  ListeningSocket(int domain, int service, int protocol, int port,
-                  u_long interface, int backlog);
+  ListeningSocket(SocketConfig config);
   void start_listening();
 
 private:

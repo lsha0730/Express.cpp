@@ -6,15 +6,14 @@
 #include <unistd.h>
 
 // Default constructor
-flash::Socket::Socket(int domain, int service, int protocol, int port,
-                      u_long interface) {
+flash::Socket::Socket(SocketConfig config) {
   // Define address structure
-  address_.sin_family = domain;
-  address_.sin_port = htons(port);
-  address_.sin_addr.s_addr = htonl(interface);
+  address_.sin_family = config.domain;
+  address_.sin_port = htons(config.port);
+  address_.sin_addr.s_addr = htonl(config.interface);
 
   // Establish connection
-  sock_ = socket(domain, service, protocol);
+  sock_ = socket(config.domain, config.service, config.protocol);
   test_connection(sock_);
 
   // Enable address reuse for all socket types

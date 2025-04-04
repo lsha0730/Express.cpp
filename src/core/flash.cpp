@@ -13,7 +13,7 @@ public:
 
   void listen(int port, Callback callback) {
     using namespace flash::constants;
-    flash::ServerConfig config = {DEFAULT_DOMAIN,    DEFAULT_SERVICE,
+    flash::SocketConfig config = {DEFAULT_DOMAIN,    DEFAULT_SERVICE,
                                   DEFAULT_PROTOCOL,  port,
                                   DEFAULT_INTERFACE, DEFAULT_BACKLOG};
     server_ = std::make_unique<Server>(config, *this);

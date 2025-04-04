@@ -8,8 +8,7 @@
 namespace flash {
 class BindingSocket : public Socket {
 public:
-  BindingSocket(int domain, int service, int protocol, int port,
-                u_long interface);
+  BindingSocket(SocketConfig config);
   int connect_to_network(int sock, struct sockaddr_in address);
 };
 }; // namespace flash

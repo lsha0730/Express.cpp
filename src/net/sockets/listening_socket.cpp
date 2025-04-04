@@ -1,10 +1,9 @@
 #include "listening_socket.h"
 #include "socket.h"
 
-flash::ListeningSocket::ListeningSocket(int domain, int service, int protocol,
-                                        int port, u_long interface, int backlog)
-    : BindingSocket(domain, service, protocol, port, interface) {
-  backlog_ = backlog;
+flash::ListeningSocket::ListeningSocket(SocketConfig config)
+    : BindingSocket(config) {
+  backlog_ = config.backlog;
   start_listening();
   test_connection(listening_);
 }

@@ -12,18 +12,9 @@
 #include "utils/constants.h"
 
 namespace flash {
-struct ServerConfig { // TODO: Put in lower level as SocketConfig
-  int domain;
-  int service;
-  int protocol;
-  int port;
-  u_long interface;
-  int backlog;
-};
-
 class Server {
 public:
-  Server(ServerConfig config, Router router);
+  Server(SocketConfig config, Router router);
   ~Server();
 
   /** Flag indicating if server is running */

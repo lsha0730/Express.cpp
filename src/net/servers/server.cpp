@@ -1,8 +1,7 @@
 #include "server.h"
 
-flash::Server::Server(ServerConfig config, Router router) {
-  socket_ = new ListeningSocket(config.domain, config.service, config.protocol,
-                                config.port, config.interface, config.backlog);
+flash::Server::Server(SocketConfig config, Router router) {
+  socket_ = new ListeningSocket(config);
   router_ = router;
 }
 

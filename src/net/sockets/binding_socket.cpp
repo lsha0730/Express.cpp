@@ -1,9 +1,7 @@
 #include "binding_socket.h"
 
 // Constructor
-flash::BindingSocket::BindingSocket(int domain, int service, int protocol,
-                                    int port, u_long interface)
-    : Socket(domain, service, protocol, port, interface) {
+flash::BindingSocket::BindingSocket(SocketConfig config) : Socket(config) {
   int connection = connect_to_network(sock(), address());
   set_connection(connection);
   test_connection(connection);

@@ -8,9 +8,18 @@
 #include <sys/socket.h>
 
 namespace flash {
+struct SocketConfig {
+  int domain;
+  int service;
+  int protocol;
+  int port;
+  u_long interface;
+  int backlog;
+};
+
 class Socket {
 public:
-  Socket(int domain, int service, int protocol, int port, u_long interface);
+  Socket(SocketConfig config);
   virtual ~Socket();
   virtual int connect_to_network(int sock, struct sockaddr_in address) = 0;
   void test_connection(int);
