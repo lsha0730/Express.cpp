@@ -1,5 +1,7 @@
 #include "router.h"
 
+flash::Router::Router() = default;
+
 void flash::Router::register_handler(HttpVerb::Value verb,
                                      Handler new_handler) {
   std::vector<Handler> &verb_handlers = handlers_[verb];
