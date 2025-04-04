@@ -1,5 +1,5 @@
-#ifndef ListeningSocket_h
-#define ListeningSocket_h
+#ifndef FLASH_LISTENING_SOCKET_H
+#define FLASH_LISTENING_SOCKET_H
 
 #include <stdio.h>
 

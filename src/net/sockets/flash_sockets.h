@@ -1,5 +1,5 @@
-#ifndef flash_sockets_h
-#define flash_sockets_h
+#ifndef FLASH_SOCKETS_H
+#define FLASH_SOCKETS_H
 
 #include <stdio.h>
 

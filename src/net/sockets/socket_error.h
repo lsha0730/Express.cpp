@@ -1,5 +1,5 @@
-#ifndef SocketError_h
-#define SocketError_h
+#ifndef FLASH_SOCKET_ERROR_H
+#define FLASH_SOCKET_ERROR_H
 
 #include <stdexcept>
 #include <string>

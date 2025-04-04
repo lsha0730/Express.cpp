@@ -1,5 +1,5 @@
-#ifndef BindingSocket_h
-#define BindingSocket_h
+#ifndef FLASH_BINDING_SOCKET_H
+#define FLASH_BINDING_SOCKET_H
 
 #include <stdio.h>
 

@@ -1,5 +1,5 @@
-#ifndef Route_h
-#define Route_h
+#ifndef FLASH_ROUTER_H
+#define FLASH_ROUTER_H
 
 #include "http/http_verb.h"
 #include "include/flash/types.h"

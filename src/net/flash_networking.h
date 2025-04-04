@@ -1,5 +1,5 @@
-#ifndef flash_networking_h
-#define flash_networking_h
+#ifndef FLASH_NETWORKING_H
+#define FLASH_NETWORKING_H
 
 #include "sockets/flash_sockets.h"
 #include <stdio.h>

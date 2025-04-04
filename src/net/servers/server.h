@@ -1,5 +1,5 @@
-#ifndef Server_h
-#define Server_h
+#ifndef FLASH_SERVER_H
+#define FLASH_SERVER_H
 
 #include <stdio.h>
 #include <thread>

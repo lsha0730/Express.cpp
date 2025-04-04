@@ -1,5 +1,5 @@
-#ifndef Socket_h
-#define Socket_h
+#ifndef FLASH_SOCKET_H
+#define FLASH_SOCKET_H
 
 #include "socket_error.h"
 #include <iostream>
