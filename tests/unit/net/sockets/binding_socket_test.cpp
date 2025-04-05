@@ -1,6 +1,9 @@
 #include "net/sockets/binding_socket.h"
 #include <gtest/gtest.h>
 
+namespace flash {
+namespace test {
+
 /**
  * Test fixture for BindingSocket tests.
  * Provides a fresh socket instance for each test and handles cleanup.
@@ -53,3 +56,6 @@ TEST_F(BindingSocketFixture, SocketIsBoundAfterInitialization) {
   EXPECT_EQ(bound_addr.sin_port, addr.sin_port);
   EXPECT_EQ(bound_addr.sin_addr.s_addr, addr.sin_addr.s_addr);
 }
+
+} // namespace test
+} // namespace flash

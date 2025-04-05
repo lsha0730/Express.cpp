@@ -4,6 +4,9 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
+namespace flash {
+namespace test {
+
 constexpr int SERVER_PORT = 8080;
 constexpr u_long SERVER_INTERFACE = INADDR_ANY;
 constexpr int BACKLOG = 3;
@@ -48,3 +51,6 @@ TEST_F(ListeningSocketFixture, SocketIsListeningAfterInit) {
   // Clean up
   close(client_sock);
 }
+
+} // namespace test
+} // namespace flash
