@@ -10,8 +10,8 @@ protected:
   std::unique_ptr<flash::BindingSocket> socket;
 
   void SetUp() override {
-    socket = std::make_unique<flash::BindingSocket>(AF_INET, SOCK_STREAM, 0,
-                                                    8080, INADDR_ANY);
+    flash::SocketConfig config = {AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY};
+    socket = std::make_unique<flash::BindingSocket>(config);
   }
 
   ~BindingSocketFixture() noexcept override = default;

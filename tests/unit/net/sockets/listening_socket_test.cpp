@@ -17,8 +17,8 @@ protected:
   std::unique_ptr<flash::ListeningSocket> server_socket;
 
   void SetUp() override {
-    server_socket = std::make_unique<flash::ListeningSocket>(
-        AF_INET, SOCK_STREAM, 0, SERVER_PORT, SERVER_INTERFACE, BACKLOG);
+    flash::SocketConfig config = {AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY};
+    server_socket = std::make_unique<flash::ListeningSocket>(config);
   }
 
   ~ListeningSocketFixture() noexcept override = default;
