@@ -1,7 +1,7 @@
 #ifndef FLASH_PUBLIC_H
 #define FLASH_PUBLIC_H
 
-#include "include/flash/types.h" // Include your types
+#include "types.h"
 #include <functional>
 #include <memory>
 #include <string>
