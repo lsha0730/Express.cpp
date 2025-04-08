@@ -1,11 +1,5 @@
 #include "request.h"
 
-/**
- * Initializes a Request object and parses a raw HTTP request.
- *
- * @param raw_request The complete HTTP request string
- * @note The constructor assumes the request is well-formed
- */
 flash::Request::Request(std::string_view raw_request) {
   flash::Request::SplitRequest split = split_request(raw_request);
   parse_request_line(split.request_line);
@@ -13,14 +7,6 @@ flash::Request::Request(std::string_view raw_request) {
   body = split.body;
 }
 
-/**
- * Splits a full HTTP request string on the CRLF and categorizes them into
- * partially-parsed buckets.
- *
- * @param raw_request The complete HTTP request string
- * @return A SplitRequest struct containing the partially-parsed request line,
- * headers, and body.
- */
 flash::Request::SplitRequest
 flash::Request::split_request(std::string_view raw_request) {
   std::string_view request_line;
@@ -49,11 +35,6 @@ flash::Request::split_request(std::string_view raw_request) {
   return flash::Request::SplitRequest{request_line, headers, body};
 }
 
-/**
- * Parses the request line into the Method, Request URI and HTTP Version
- *
- * @param request_line The request line as a single, space-delimited string
- */
 void flash::Request::parse_request_line(std::string_view request_line) {
   int left = 0;
   std::vector<std::string_view> parts;
@@ -76,19 +57,11 @@ void flash::Request::parse_request_line(std::string_view request_line) {
   parse_parameters();
 }
 
-/**
- * Parses the full URI for parameters
- */
 void flash::Request::parse_parameters() {
   std::string_view url_view = std::string_view(original_url);
   // TODO: Implement, and make sure to use url decoding too
 }
 
-/**
- * Parses a vector of header lines into internal key-value pairs
- *
- * @param header_lines A vector of strings, each representing a header line
- */
 void flash::Request::parse_headers(std::vector<std::string_view> header_lines) {
   for (std::string_view header : header_lines) {
     for (int i = 0; i < header.length(); i++) {
@@ -105,13 +78,6 @@ void flash::Request::parse_headers(std::vector<std::string_view> header_lines) {
   }
 }
 
-/**
- * Checks if a CRLF sequence begins at the specified index for a string view
- *
- * @param str The string view in question
- * @param i The index which may be the CR in a CRLF sequence.
- * @return A boolean indicating whether or not CRLF begins at i
- */
 bool flash::Request::is_crlf(std::string_view str, int i) {
   if (i < 0 || i + 1 >= str.length())
     return false;
