@@ -1,6 +1,7 @@
 #ifndef FLASH_SERVER_H
 #define FLASH_SERVER_H
 
+#include <memory>
 #include <stdio.h>
 #include <thread>
 #include <unistd.h>
@@ -47,9 +48,6 @@ private:
   /** Temporary socket for current client connection */
   int new_socket_;
 
-  /** Buffer for reading request data */
-  std::vector<char> buffer_;
-
   /** Router for handling requests */
   Router router_;
 
@@ -69,19 +67,26 @@ private:
   void handle_connection();
 
   /**
-   * Accepts a request and reads the raw data chunk-by-chunk into the internal
-   * buffer.
+   * Reads the raw data chunk-by-chunk into buffer.
    * @private
+   * @return Total number of bytes read.
    */
-  void accepter();
+  int read_socket(std::vector<char> &buffer);
 
   /**
-   * Parses the buffer into a Request object, then delegates execution to Router
-   * instance. Clears the buffer.
+   * Accepts a request and reads the raw data chunk-by-chunk into the internal
+   * buffer. Parses into Request object.
+   * @private
+   * @return Pointer to the parsed Request object.
+   */
+  std::unique_ptr<flash::Request> accepter();
+
+  /**
+   * Delegates execution of request to Router instance.
    * @return Response object with response data
    * @private
    */
-  Response handler();
+  Response &handler(Request &request);
 
   /**
    * Encodes Response object into strings before writing to socket.
