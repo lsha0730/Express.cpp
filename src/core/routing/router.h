@@ -2,6 +2,7 @@
 #define FLASH_ROUTER_H
 
 #include "http/http_verb.h"
+#include "include/flash/request.h"
 #include "include/flash/types.h"
 #include <iostream>
 #include <map>
@@ -13,7 +14,7 @@ class Router {
 public:
   Router();
   // Execute incoming request
-  Response run(Request request);
+  Response run(Request &request);
 
   // Handler registration functions
   void del(std::string route, Handler handler);

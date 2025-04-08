@@ -37,7 +37,7 @@ void flash::Server::accepter() {
 flash::Response flash::Server::handler() {
   std::string raw_request = std::string(buffer_.begin(), buffer_.end());
   buffer_.clear();
-  Request request = raw_request; // TODO: Add parsing step here
+  Request request = Request(raw_request); // TODO: Add parsing step here
   Response response = router_.run(request);
   return response;
 }
