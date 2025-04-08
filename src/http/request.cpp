@@ -54,12 +54,47 @@ void flash::Request::parse_request_line(std::string_view request_line) {
   original_url = parts[1];
   http_version = parts[2];
 
-  parse_parameters();
+  parse_url();
 }
 
-void flash::Request::parse_parameters() {
-  std::string_view url_view = std::string_view(original_url);
-  // TODO: Implement, and make sure to use url decoding too
+void flash::Request::parse_url() {
+  std::string_view query = split_url();
+  size_t param_start = 0;
+  size_t param_end;
+
+  while (param_start < query.length()) {
+    param_end = query.find('&', param_start);
+    if (param_end == std::string::npos) {
+      param_end = query.length();
+    }
+
+    std::string_view param = query.substr(param_start, param_end - param_start);
+
+    size_t equals_pos = param.find('=');
+    if (equals_pos != std::string::npos) {
+      std::string_view key = param.substr(0, equals_pos);
+      std::string_view value = param.substr(equals_pos + 1);
+
+      if (!key.empty()) {
+        params[UrlCodec::decode(key)] = UrlCodec::decode(value);
+      }
+    }
+
+    param_start = param_end + 1;
+  }
+}
+
+std::string_view flash::Request::split_url() {
+  size_t question_mark_index = original_url.find("?");
+  if (question_mark_index == std::string::npos) {
+    path = original_url;
+    return "";
+  }
+  path = original_url.substr(0, question_mark_index);
+
+  std::string_view query =
+      std::string_view(original_url).substr(question_mark_index + 1);
+  return query;
 }
 
 void flash::Request::parse_headers(std::vector<std::string_view> header_lines) {

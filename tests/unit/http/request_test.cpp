@@ -158,10 +158,16 @@ TEST(RequestTest, RequestWithQueryString) {
 
   EXPECT_EQ(request.method, "GET");
   EXPECT_EQ(request.original_url, "/search?q=test&page=1");
+  EXPECT_EQ(request.path, "/search");
   EXPECT_EQ(request.http_version, "HTTP/1.1");
   EXPECT_EQ(request.headers.size(), 1);
   EXPECT_EQ(request.headers["Host"], "example.com");
   EXPECT_TRUE(request.body.empty());
+
+  // Test that params were parsed correctly
+  EXPECT_EQ(request.params.size(), 2);
+  EXPECT_EQ(request.params["q"], "test");
+  EXPECT_EQ(request.params["page"], "1");
 }
 
 // Test a request with a fragment in the URI
@@ -178,6 +184,112 @@ TEST(RequestTest, RequestWithFragment) {
   EXPECT_EQ(request.headers.size(), 1);
   EXPECT_EQ(request.headers["Host"], "example.com");
   EXPECT_TRUE(request.body.empty());
+}
+
+// Test parsing of URL-encoded parameters
+TEST(RequestTest, RequestWithEncodedParameters) {
+  std::string raw_request =
+      "GET /search?q=hello+world&category=books%20%26%20media HTTP/1.1\r\n"
+      "Host: example.com\r\n"
+      "\r\n";
+
+  Request request(raw_request);
+
+  EXPECT_EQ(request.method, "GET");
+  EXPECT_EQ(request.original_url,
+            "/search?q=hello+world&category=books%20%26%20media");
+  EXPECT_EQ(request.path, "/search");
+  EXPECT_EQ(request.params.size(), 2);
+  EXPECT_EQ(request.params["q"], "hello world");
+  EXPECT_EQ(request.params["category"], "books & media");
+}
+
+// Test parsing parameters with no values
+TEST(RequestTest, RequestWithEmptyParameterValues) {
+  std::string raw_request = "GET /api?token=abc123&filter=&sort= HTTP/1.1\r\n"
+                            "Host: example.com\r\n"
+                            "\r\n";
+
+  Request request(raw_request);
+
+  EXPECT_EQ(request.method, "GET");
+  EXPECT_EQ(request.path, "/api");
+  EXPECT_EQ(request.params.size(), 3);
+  EXPECT_EQ(request.params["token"], "abc123");
+  EXPECT_EQ(request.params["filter"], "");
+  EXPECT_EQ(request.params["sort"], "");
+}
+
+// Test parsing parameters with special characters
+TEST(RequestTest, RequestWithSpecialCharactersInParameters) {
+  std::string raw_request =
+      "GET /search?q=%E6%97%A5%E6%9C%AC%E8%AA%9E&year=2023-2024 HTTP/1.1\r\n"
+      "Host: example.com\r\n"
+      "\r\n";
+
+  Request request(raw_request);
+
+  EXPECT_EQ(request.method, "GET");
+  EXPECT_EQ(request.path, "/search");
+  EXPECT_EQ(request.params.size(), 2);
+  EXPECT_EQ(request.params["q"], "日本語");
+  EXPECT_EQ(request.params["year"], "2023-2024");
+}
+
+// Test parsing a complex query string with multiple parameters
+TEST(RequestTest, RequestWithComplexQueryString) {
+  std::string raw_request =
+      "GET "
+      "/products?category=electronics&price=100-500&brand=apple&brand=samsung&"
+      "in_stock=true&sort=price&direction=asc HTTP/1.1\r\n"
+      "Host: example.com\r\n"
+      "\r\n";
+
+  Request request(raw_request);
+
+  EXPECT_EQ(request.method, "GET");
+  EXPECT_EQ(request.path, "/products");
+  EXPECT_EQ(request.params.size(), 6);
+  EXPECT_EQ(request.params["category"], "electronics");
+  EXPECT_EQ(request.params["price"], "100-500");
+  EXPECT_EQ(request.params["in_stock"], "true");
+  EXPECT_EQ(request.params["sort"], "price");
+  EXPECT_EQ(request.params["direction"], "asc");
+  // Note: For multiple values with the same key, only the last one is stored
+  EXPECT_EQ(request.params["brand"], "samsung");
+}
+
+// Test parsing POST request with both URL parameters and body
+TEST(RequestTest, PostRequestWithUrlParameters) {
+  std::string raw_request =
+      "POST /submit?source=web&ref=homepage HTTP/1.1\r\n"
+      "Host: example.com\r\n"
+      "Content-Type: application/x-www-form-urlencoded\r\n"
+      "\r\n"
+      "name=John&email=john%40example.com";
+
+  Request request(raw_request);
+
+  EXPECT_EQ(request.method, "POST");
+  EXPECT_EQ(request.path, "/submit");
+  EXPECT_EQ(request.params.size(), 2);
+  EXPECT_EQ(request.params["source"], "web");
+  EXPECT_EQ(request.params["ref"], "homepage");
+  EXPECT_EQ(request.body, "name=John&email=john%40example.com");
+}
+
+// Test a request with no query parameters
+TEST(RequestTest, RequestWithNoParameters) {
+  std::string raw_request = "GET /about HTTP/1.1\r\n"
+                            "Host: example.com\r\n"
+                            "\r\n";
+
+  Request request(raw_request);
+
+  EXPECT_EQ(request.method, "GET");
+  EXPECT_EQ(request.original_url, "/about");
+  EXPECT_EQ(request.path, "/about");
+  EXPECT_TRUE(request.params.empty());
 }
 
 } // namespace test

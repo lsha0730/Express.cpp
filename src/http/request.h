@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "url_codec.h"
+
 namespace flash {
 class Request {
 public:
@@ -37,6 +39,11 @@ private:
     std::string_view body;
   };
 
+  struct SplitUrl {
+    std::string_view path;
+    std::string_view params;
+  };
+
   /**
    * Splits a full HTTP request string on the CRLF and categorizes them into
    * partially-parsed buckets.
@@ -45,7 +52,7 @@ private:
    * @return A SplitRequest struct containing the partially-parsed request line,
    * headers, and body.
    */
-  Request::SplitRequest split_request(std::string_view raw_request);
+  SplitRequest split_request(std::string_view raw_request);
 
   /**
    * Parses the request line into the Method, Request URI and HTTP Version
@@ -55,9 +62,16 @@ private:
   void parse_request_line(std::string_view request_line);
 
   /**
-   * Parses the full URI for parameters
+   * Parses the full URL for parameters
    */
-  void parse_parameters();
+  void parse_url();
+
+  /**
+   * Parses in the path and returns the query string
+   * Assumes the original_url is already populated with the unbroken string
+   * @return The query part of the URL, excluding the '?'
+   */
+  std::string_view split_url();
 
   /**
    * Parses a vector of header lines into internal key-value pairs
