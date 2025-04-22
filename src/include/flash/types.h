@@ -8,10 +8,10 @@
 namespace flash {
 
 class Request;
+class Response;
 
-using Handler = std::function<void(Request &request, std::string)>;
+using Handler = std::function<void(Request &request, Response &response)>;
 using Callback = std::function<void()>;
-using Response = std::string; // TODO: Replace with proper struct
 } // namespace flash
 
 #endif

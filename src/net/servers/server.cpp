@@ -46,22 +46,15 @@ int flash::Server::read_socket(std::vector<char> &buffer) {
   return total_bytes_read;
 }
 
-flash::Response &flash::Server::handler(Request &request) {
-  Response response = router_.run(request);
-  return response;
-}
-
-void flash::Server::responder(Response response) {
-  std::string_view response_string =
-      response; // TODO: Add deconstruction step here
-  write(new_socket_, response.data(), response.size());
+void flash::Server::responder(std::string content) {
+  write(new_socket_, content.data(), content.size());
   close(new_socket_);
 }
 
 void flash::Server::handle_connection() {
   std::unique_ptr<Request> request = accepter();
-  Response response = handler(*request);
-  responder(response);
+  Response response([this](std::string content) { this->responder(content); });
+  router_.run(*request, response);
 }
 
 flash::ListeningSocket *flash::Server::socket() { return socket_; }
