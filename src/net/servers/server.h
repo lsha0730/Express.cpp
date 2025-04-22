@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <vector>
 
-#include "core/routing/router.h"
+#include "core/router.h"
 #include "include/flash/types.h"
 #include "net/flash_networking.h"
 #include "utils/constants.h"
@@ -82,17 +82,10 @@ private:
   std::unique_ptr<flash::Request> accepter();
 
   /**
-   * Delegates execution of request to Router instance.
-   * @return Response object with response data
+   * Writes given string to socket.
    * @private
    */
-  Response &handler(Request &request);
-
-  /**
-   * Encodes Response object into strings before writing to socket.
-   * @private
-   */
-  void responder(Response response);
+  void responder(std::string content);
 };
 }; // namespace flash
 

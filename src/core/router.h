@@ -3,6 +3,7 @@
 
 #include "http/http_verb.h"
 #include "include/flash/request.h"
+#include "include/flash/response.h"
 #include "include/flash/types.h"
 #include <iostream>
 #include <map>
@@ -14,7 +15,7 @@ class Router {
 public:
   Router();
   // Execute incoming request
-  Response run(Request &request);
+  void run(Request &request, Response &response);
 
   // Handler registration functions
   void del(std::string route, Handler handler);
@@ -31,6 +32,6 @@ private:
   std::map<std::string, Router> subrouters_;
   // TODO: Middleware stack
 };
-}; // namespace flash
+} // namespace flash
 
 #endif
