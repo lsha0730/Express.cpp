@@ -52,6 +52,13 @@ public:
    */
   Response &status(int code);
 
+  /**
+   * Sets a response header.
+   * @param header
+   * @param value
+   */
+  Response &set(const std::string &header, const std::string &value);
+
   // Rule of 5
   ~Response();
   Response(const Response &) = delete;

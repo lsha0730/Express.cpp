@@ -23,14 +23,14 @@ public:
   };
 
   /**
-   * Sends the jsonified response back to the client.
+   * Sends the response back to the client.
+   * @note Infers the Content-Type header from the data type.
    * @warning Finalizing action. Locks down the response from further sends.
    * @throws Error if a redundant send is attempted.
    */
   template <typename T> void send(const T &data) {
     check_sendable();
-    set_header("Content-Type", "application/json; charset=utf-8");
-    set_header("Content-Length", std::to_string(data.size()));
+    set("Content-Type", "application/json; charset=utf-8", false);
     send_string(data);
   }
 
@@ -42,8 +42,7 @@ public:
    */
   void json(const std::string &data) {
     check_sendable();
-    set_header("Content-Type", "application/json; charset=utf-8");
-    set_header("Content-Length", std::to_string(data.size()));
+    set("Content-Type", "application/json; charset=utf-8", false);
     send_string(data);
   }
 
@@ -54,6 +53,19 @@ public:
   void status(int code) {
     status_code_ = code;
     status_message_ = HttpStatus::getMessage(code);
+  }
+
+  /**
+   * Sets a response header.
+   * @param header
+   * @param value
+   * @param overwrite Optional. Overwrite existing header? Defaults to true.
+   */
+  void set(const std::string &header, const std::string &value, bool overwrite = true) {
+    if (!overwrite && (headers_.find(header) != headers_.end())) {
+      return;
+    }
+    headers_[header] = value;
   }
 
   /**
@@ -96,6 +108,9 @@ private:
    */
   void set_defaults() {
     status(200);
+    std::string server_info =
+        fmt::format("{}/{} ({})", metadata::SERVER_NAME, metadata::VERSION, get_os_name());
+    set("Server", server_info, false);
     headers_sent_ = false;
   }
 
@@ -106,18 +121,13 @@ private:
    * @private
    */
   void send_string(std::string content) {
+    set("Content-Length", std::to_string(content.size()), false);
+    set("Date", get_http_date_string(), true);
+
     std::string http_response_string = build_http_response(content);
     on_send_(http_response_string);
     headers_sent_ = true;
   }
-
-  /**
-   * Sets a response header.
-   * @param key Header name
-   * @param value Header value
-   * @private
-   */
-  void set_header(const std::string &key, const std::string &value) { headers_[key] = value; }
 
   /**
    * Checks if the response is locked.
@@ -173,12 +183,6 @@ private:
   }
 
   /**
-   * Adds a date header with HTTP format date string.
-   * @private
-   */
-  void build_date_header() { set_header("Date", get_http_date_string()); }
-
-  /**
    * Generates a date string in the HTTP response header format.
    * @returns A date in the [Day, DD Mth YYYY HH:MM:SS GMT] format
    * @example Thu, 19 Apr 2025 12:00:00 GMT
@@ -190,17 +194,6 @@ private:
     std::ostringstream oss;
     oss << std::put_time(gmt, "%a, %d %b %Y %H:%M:%S GMT");
     return oss.str();
-  }
-
-  /**
-   * Adds a Server header with version and OS information.
-   * @example Server: Flash/0.1.0 (macOS)
-   * @private
-   */
-  void build_server_header() {
-    std::string server_info =
-        fmt::format("{}/{} ({})", metadata::SERVER_NAME, metadata::VERSION, get_os_name());
-    set_header("Server", server_info);
   }
 
   /**
@@ -247,6 +240,11 @@ Response &Response::json_(const std::string &data) {
 
 Response &Response::status(int code) {
   pImpl->status(code);
+  return *this;
+}
+
+Response &Response::set(const std::string &header, const std::string &value) {
+  pImpl->set(header, value, true);
   return *this;
 }
 } // namespace flash
