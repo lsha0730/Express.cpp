@@ -22,6 +22,17 @@ public:
   template <typename T> Response &send(const T &data);
 
   /**
+   * Sends a nlohmann::json object to the client with the included data as serialized JSON string.
+   * @tparam T Type that can be converted to JSON
+   * @param data The data to send.
+   * @returns Reference to this response for chaining
+   */
+  Response &json(const nlohmann::json &data) {
+    nlohmann::json s = data.dump(4);
+    return json_(std::move(s));
+  }
+
+  /**
    * Sends a response to the client with the included data as serialized JSON string.
    * @warning Any structs that are passed in must be registered with one of
    * FLASH_REGISTER_STRUCT_INTRUSIVE or FLASH_REGISTER_STRUCT_NON_INTRUSIVE.
