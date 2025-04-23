@@ -71,12 +71,16 @@ target_link_libraries(flash PRIVATE
 
 # Create executable that uses the library
 add_executable(flash_server src/main.cpp)
-target_link_libraries(flash_server PRIVATE flash)
+target_link_libraries(flash_server PRIVATE 
+    flash
+    nlohmann_json::nlohmann_json
+)
 
 # Add include directories for the executable
 target_include_directories(flash_server
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        $<TARGET_PROPERTY:nlohmann_json::nlohmann_json,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 # Add compile options for the executable

@@ -4,6 +4,7 @@
 #include "types.h"
 #include <functional>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
 
 namespace flash {
@@ -12,20 +13,26 @@ class Server;
 class Response {
 public:
   /**
-   * Sends a JSON-serializable response back to the client.
-   * @tparam T Type that can be converted to JSON
-   * @param data The data to send as JSON
+   * Sends a response to the client with the specified body content.
+   * @tparam T Type, either Buffer, String, Object, Array, or Number.
+   * @param data The data to send.
+   * @note Numbers are interpreted as status codes.
    * @returns Reference to this response for chaining
    */
   template <typename T> Response &send(const T &data);
 
   /**
-   * Sends a JSON-serializable response back to the client with pretty printing.
+   * Sends a response to the client with the included data as serialized JSON string.
+   * @warning Any structs that are passed in must be registered with one of
+   * FLASH_REGISTER_STRUCT_INTRUSIVE or FLASH_REGISTER_STRUCT_NON_INTRUSIVE.
    * @tparam T Type that can be converted to JSON
    * @param data The data to send as JSON
    * @returns Reference to this response for chaining
    */
-  template <typename T> Response &json(const T &data);
+  template <typename T> Response &json(const T &data) {
+    nlohmann::json s = nlohmann::json(data).dump(4);
+    return json_(std::move(s));
+  }
 
   /**
    * Sets the HTTP status code.
@@ -44,6 +51,8 @@ public:
 private:
   friend class Server;
   explicit Response(std::function<void(const std::string &)> on_send);
+
+  Response &json_(const std::string &data);
 
   class Impl;
   std::unique_ptr<Impl> pImpl;

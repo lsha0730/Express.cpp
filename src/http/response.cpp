@@ -23,26 +23,29 @@ public:
   };
 
   /**
-   * Sends the jsonify-able response back to the client.
+   * Sends the jsonified response back to the client.
    * @warning Finalizing action. Locks down the response from further sends.
    * @throws Error if a redundant send is attempted.
-   * @tparam T Type that can be converted to JSON
    */
   template <typename T> void send(const T &data) {
     check_sendable();
-    std::string jsonified = nlohmann::json(data).dump(4);
     set_header("Content-Type", "application/json; charset=utf-8");
-    set_header("Content-Length", std::to_string(jsonified.size()));
-    send_raw(std::string(jsonified));
+    set_header("Content-Length", std::to_string(data.size()));
+    send_string(data);
   }
 
   /**
-   * Sends the json response back to the client with pretty printing.
+   * Sends already-stringified JSON response back to the client.
+   * Sets a JSON-appropriate header.
    * @warning Finalizing action. Locks down the response from further sends.
    * @throws Error if a redundant send is attempted.
-   * @tparam T Type that can be converted to JSON
    */
-  template <typename T> void json(const T &data) { send(data); }
+  void json(const std::string &data) {
+    check_sendable();
+    set_header("Content-Type", "application/json; charset=utf-8");
+    set_header("Content-Length", std::to_string(data.size()));
+    send_string(data);
+  }
 
   /**
    * Sets the status code of the response
@@ -102,7 +105,7 @@ private:
    * @warning Does not check if a response has been sent already.
    * @private
    */
-  void send_raw(std::string content) {
+  void send_string(std::string content) {
     std::string http_response_string = build_http_response(content);
     on_send_(http_response_string);
     headers_sent_ = true;
@@ -232,12 +235,12 @@ Response::Response(std::function<void(const std::string &)> on_send)
 // Destructor
 Response::~Response() = default;
 
-template <typename T> Response &Response::send(const T &data) {
-  pImpl->send(data);
-  return *this;
+template <typename T> Response &send(const T &data) {
+  // pImpl->send(data);
+  // return *this;
 }
 
-template <typename T> Response &Response::json(const T &data) {
+Response &Response::json_(const std::string &data) {
   pImpl->json(data);
   return *this;
 }

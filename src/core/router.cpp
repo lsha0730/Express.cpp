@@ -37,5 +37,4 @@ void flash::Router::run(Request &request, Response &response) {
   } else {
     // TODO: Recursive matching
   }
-  std::cout << request.path << std::endl; // TODO: Remove
 }
