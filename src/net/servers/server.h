@@ -74,18 +74,23 @@ private:
   int read_socket(std::vector<char> &buffer);
 
   /**
-   * Accepts a request and reads the raw data chunk-by-chunk into the internal
-   * buffer. Parses into Request object.
+   * Writes given bytes to the socket.
+   * @private
+   */
+  void write_socket(std::vector<char> content);
+
+  /**
+   * Closes the socket and ends the connection.
+   * @private
+   */
+  void close_socket();
+
+  /**
+   * Reads incoming request into buffer, before returning as parsed Request object.
    * @private
    * @return Pointer to the parsed Request object.
    */
-  std::unique_ptr<flash::Request> accepter();
-
-  /**
-   * Writes given string to socket.
-   * @private
-   */
-  void responder(std::string content);
+  std::unique_ptr<flash::Request> read_request();
 };
 }; // namespace flash
 

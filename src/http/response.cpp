@@ -17,39 +17,26 @@
 namespace flash {
 class Response::Impl {
 public:
-  Impl(std::function<void(std::string)> on_send) {
-    on_send_ = on_send;
+  Impl(std::function<void(const std::vector<char>)> write_to_socket,
+       std::function<void()> close_socket) {
+    write_to_socket_ = write_to_socket;
+    close_socket_ = close_socket;
     set_defaults();
   };
 
-  /**
-   * Sends the response back to the client.
-   * @note Infers the Content-Type header from the data type.
-   * @warning Finalizing action. Locks down the response from further sends.
-   * @throws Error if a redundant send is attempted.
-   */
   template <typename T> void send(const T &data) {
     check_sendable();
     set("Content-Type", "application/json; charset=utf-8", false);
-    send_string(data);
+    send_bytes(data);
   }
 
-  /**
-   * Sends already-stringified JSON response back to the client.
-   * Sets a JSON-appropriate header.
-   * @warning Finalizing action. Locks down the response from further sends.
-   * @throws Error if a redundant send is attempted.
-   */
   void json(const std::string &data) {
     check_sendable();
     set("Content-Type", "application/json; charset=utf-8", false);
-    send_string(data);
+    std::vector<char> bytes(data.begin(), data.end());
+    send_bytes(bytes);
   }
 
-  /**
-   * Sets the status code of the response
-   * @param code HTTP status code (e.g., 200, 404, 500)
-   */
   void status(int code) {
     status_code_ = code;
     status_message_ = HttpStatus::getMessage(code);
@@ -59,13 +46,18 @@ public:
    * Sets a response header.
    * @param header
    * @param value
-   * @param overwrite Optional. Overwrite existing header? Defaults to true.
+   * @param overwrite If false, keeps existing header (default: true).
    */
   void set(const std::string &header, const std::string &value, bool overwrite = true) {
     if (!overwrite && (headers_.find(header) != headers_.end())) {
       return;
     }
     headers_[header] = value;
+  }
+
+  void end() {
+    headers_sent_ = true;
+    close_socket_();
   }
 
   /**
@@ -99,8 +91,11 @@ private:
   /* HTTP Version (1.1 by default) */
   static const inline std::string http_version_ = "1.1";
 
-  /* Callback registered by server to continue to socket write */
-  std::function<void(std::string)> on_send_;
+  /* Callback registered by server to write to socket */
+  std::function<void(const std::vector<char>)> write_to_socket_;
+
+  /* Callback registered by server to close the socket */
+  std::function<void()> close_socket_;
 
   /**
    * Sets default values for the object
@@ -116,16 +111,16 @@ private:
 
   /**
    * Sends the response back to the client.
-   * @param content Pre-stringified content, to be sent as the response body.
+   * @param body Bytes to be sent as the response body.
    * @warning Does not check if a response has been sent already.
    * @private
    */
-  void send_string(std::string content) {
-    set("Content-Length", std::to_string(content.size()), false);
+  void send_bytes(std::vector<char> body) {
+    set("Content-Length", std::to_string(body.size()), false);
     set("Date", get_http_date_string(), true);
 
-    std::string http_response_string = build_http_response(content);
-    on_send_(http_response_string);
+    std::vector<char> http_response = build_http_response(body);
+    write_to_socket_(http_response);
     headers_sent_ = true;
   }
 
@@ -142,15 +137,22 @@ private:
 
   /**
    * Builds the complete HTTP response string.
-   * @param content Pre-stringified content, to be sent as the response body.
-   * @returns Complete HTTP response string
+   * @param body The response body.
+   * @returns Complete HTTP response
    * @private
    * @todo Factor out into separate class
    */
-  std::string build_http_response(std::string content) {
+  std::vector<char> build_http_response(std::vector<char> body) {
     std::string status_line = build_status_line();
     std::string headers = build_headers();
-    return fmt::format("{}\r\n{}\r\n\r\n{}", status_line, headers, content);
+    std::string head = fmt::format("{}\r\n{}\r\n\r\n", status_line, headers);
+
+    std::vector<char> response;
+    response.reserve(head.size() + body.size());
+    response.insert(response.end(), head.begin(), head.end());
+    response.insert(response.end(), body.begin(), body.end());
+
+    return response;
   }
 
   /**
@@ -218,11 +220,12 @@ private:
     return "Unknown";
 #endif
   }
-};
+}; // namespace Response::Impl
 
 // Constructor
-Response::Response(std::function<void(const std::string &)> on_send)
-    : pImpl(std::make_unique<Impl>(on_send)) {
+Response::Response(std::function<void(const std::vector<char>)> write_to_socket,
+                   std::function<void()> close_socket)
+    : pImpl(std::make_unique<Impl>(write_to_socket, close_socket)) {
 }
 
 // Destructor
@@ -246,5 +249,9 @@ Response &Response::status(int code) {
 Response &Response::set(const std::string &header, const std::string &value) {
   pImpl->set(header, value, true);
   return *this;
+}
+
+void Response::end() {
+  pImpl->end();
 }
 } // namespace flash

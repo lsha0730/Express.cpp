@@ -10,11 +10,10 @@ flash::Server::~Server() {
   delete socket_;
 }
 
-std::unique_ptr<flash::Request> flash::Server::accepter() {
+std::unique_ptr<flash::Request> flash::Server::read_request() {
   struct sockaddr_in address = socket()->address();
   int addrlen = sizeof(address);
-  new_socket_ = accept(socket()->sock(), (struct sockaddr *)&address,
-                       (socklen_t *)&addrlen);
+  new_socket_ = accept(socket()->sock(), (struct sockaddr *)&address, (socklen_t *)&addrlen);
 
   std::vector<char> buffer;
   read_socket(buffer);
@@ -46,18 +45,29 @@ int flash::Server::read_socket(std::vector<char> &buffer) {
   return total_bytes_read;
 }
 
-void flash::Server::responder(std::string content) {
+void flash::Server::write_socket(std::vector<char> content) {
   write(new_socket_, content.data(), content.size());
+}
+
+void flash::Server::close_socket() {
   close(new_socket_);
 }
 
 void flash::Server::handle_connection() {
-  std::unique_ptr<Request> request = accepter();
-  Response response([this](std::string content) { this->responder(content); });
+  std::unique_ptr<Request> request = read_request();
+  Response response(
+      [this](const std::vector<char> &data) {
+        this->write_socket(data);
+      },
+      [this]() {
+        this->close_socket();
+      });
   router_.run(*request, response);
 }
 
-flash::ListeningSocket *flash::Server::socket() { return socket_; }
+flash::ListeningSocket *flash::Server::socket() {
+  return socket_;
+}
 
 void flash::Server::launch() {
   if (is_running)
