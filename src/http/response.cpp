@@ -122,6 +122,7 @@ private:
     std::vector<char> http_response = build_http_response(body);
     write_to_socket_(http_response);
     headers_sent_ = true;
+    close_socket_();
   }
 
   /**
