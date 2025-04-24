@@ -27,38 +27,45 @@ public:
     set_defaults();
   };
 
+  template <NullLike T> void send(const T &body) { send_bytes({}); }
+
   template <BufferLike T> void send(const T &body) {
     set("Content-Type", "application/octet-stream");
     std::vector<char> bytes = flash::to_bytes(body);
     send_bytes(bytes);
   }
 
-  template <StringLike T> void send(const T &body) {
+  template <StringLike T>
+    requires(!BufferLike<T> && !NullLike<T>)
+  void send(const T &body) {
     set("Content-Type", "text/html; charset=utf-8");
     std::vector<char> bytes = flash::to_bytes(body);
     send_bytes(bytes);
   }
 
-  template <BoolLike T> void send(const T &body) {
+  template <BoolLike T>
+    requires(!StringLike<T>)
+  void send(const T &body) {
     set("Content-Type", "text/html; charset=utf-8");
     std::string serialized = (body) ? "true" : "false";
     std::vector<char> bytes = flash::to_bytes(serialized);
     send_bytes(bytes);
   }
 
-  template <NumberLike T> void send(const T &body) {
+  template <NumberLike T>
+    requires(!StringLike<T> && !BoolLike<T>)
+  void send(const T &body) {
     if constexpr (std::is_same<T, int>::value) {
       if (HttpStatus::is_valid(body)) {
         status(body);
         send_bytes({});
+        return;
       }
     }
     set("Content-Type", "text/html; charset=utf-8");
     std::vector<char> bytes = flash::to_bytes(std::to_string(body));
     send_bytes(bytes);
   }
-
-  template <NullLike T> void send(const T &body) { send_bytes({}); }
 
   void send(const nlohmann::json &body) { json(body); }
 
@@ -67,10 +74,6 @@ public:
     std::string serialized = nlohmann::json(body).dump(4);
     std::vector<char> bytes = flash::to_bytes(serialized);
     send_bytes(bytes);
-  }
-
-  template <typename T> void send(const T &body) {
-    static_assert(sizeof(T) == 0, "flash::Response::send(): Unsupported type provided");
   }
 
   void json(const nlohmann::json &data) {
@@ -103,21 +106,20 @@ public:
     headers_[header] = value;
   }
 
+  std::string get(const std::string &header) {
+    if (headers_.find(header) == headers_.end()) {
+      throw std::runtime_error(fmt::format("Header {} does not exist", header));
+    }
+    return headers_[header];
+  }
+
   void end() {
     headers_sent_ = true;
     close_socket_();
   }
 
-  /**
-   * @returns The HTTP status code.
-   * @note Deviates from Express.js API in the name of cpp best practices!
-   */
   int status_code() { return status_code_; }
 
-  /**
-   * @returns A boolean indicating whether or not the response has been sent.
-   * @note Deviates from Express.js API in the name of cpp best practices!
-   */
   bool headers_sent() { return headers_sent_; }
 
 private:
@@ -280,9 +282,9 @@ Response::Response(std::function<void(const std::vector<char>)> write_to_socket,
 // Destructor
 Response::~Response() = default;
 
-template <typename T> Response &send(const T &data) {
-  // pImpl->send(data);
-  // return *this;
+template <Sendable T> Response &Response::send(const T &data) {
+  pImpl->send(data);
+  return *this;
 }
 
 Response &Response::json(const nlohmann::json &data) {
@@ -305,7 +307,80 @@ Response &Response::set(const std::string &header, const std::string &value) {
   return *this;
 }
 
+std::string Response::get(const std::string &header) {
+  return pImpl->get(header);
+}
+
 void Response::end() {
   pImpl->end();
 }
+
+int Response::status_code() {
+  return pImpl->status_code();
+}
+
+bool Response::headers_sent() {
+  return pImpl->headers_sent();
+}
+
+// Explicit template instantiations
+// BufferLike types
+template Response &Response::send<std::vector<char>>(const std::vector<char> &);
+template Response &Response::send<std::vector<uint8_t>>(const std::vector<uint8_t> &);
+template Response &Response::send<std::vector<std::byte>>(const std::vector<std::byte> &);
+template Response &Response::send<std::span<char>>(const std::span<char> &);
+template Response &Response::send<std::span<uint8_t>>(const std::span<uint8_t> &);
+template Response &Response::send<std::span<std::byte>>(const std::span<std::byte> &);
+
+// StringLike types
+template Response &Response::send<std::string>(const std::string &);
+template Response &Response::send<std::string_view>(const std::string_view &);
+template Response &Response::send<char>(const char &);
+template Response &Response::send<std::filesystem::path>(const std::filesystem::path &);
+
+// BoolLike type
+template Response &Response::send<bool>(const bool &);
+
+// NumberLike types (excluding char since it's already covered by StringLike)
+template Response &Response::send<signed char>(const signed char &);
+template Response &Response::send<unsigned char>(const unsigned char &);
+template Response &Response::send<short>(const short &);
+template Response &Response::send<unsigned short>(const unsigned short &);
+template Response &Response::send<int>(const int &);
+template Response &Response::send<unsigned int>(const unsigned int &);
+template Response &Response::send<long>(const long &);
+template Response &Response::send<unsigned long>(const unsigned long &);
+template Response &Response::send<long long>(const long long &);
+template Response &Response::send<unsigned long long>(const unsigned long long &);
+template Response &Response::send<float>(const float &);
+template Response &Response::send<double>(const double &);
+template Response &Response::send<long double>(const long double &);
+
+// NullLike type
+template Response &Response::send<std::nullptr_t>(const std::nullptr_t &);
+
+// ObjectLike types - need to instantiate for common container types
+// MapLike types
+template Response &
+Response::send<std::map<std::string, std::string>>(const std::map<std::string, std::string> &);
+template Response &Response::send<std::unordered_map<std::string, std::string>>(
+    const std::unordered_map<std::string, std::string> &);
+
+// Iterable types
+template Response &Response::send<std::vector<int>>(const std::vector<int> &);
+template Response &Response::send<std::vector<double>>(const std::vector<double> &);
+template Response &Response::send<std::vector<std::string>>(const std::vector<std::string> &);
+template Response &Response::send<std::set<int, std::less<int>, std::allocator<int>>>(
+    const std::set<int, std::less<int>, std::allocator<int>> &);
+template Response &
+Response::send<std::set<std::string, std::less<std::string>, std::allocator<std::string>>>(
+    const std::set<std::string, std::less<std::string>, std::allocator<std::string>> &);
+
+// Raw arrays
+template Response &Response::send<char[5]>(const char (&)[5]);
+template Response &Response::send<int[5]>(const int (&)[5]);
+
+// Json type
+template Response &Response::send<nlohmann::json>(const nlohmann::json &);
+
 } // namespace flash

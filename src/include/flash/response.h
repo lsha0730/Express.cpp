@@ -1,6 +1,7 @@
 #ifndef FLASH_PUBLIC_RESPONSE_H
 #define FLASH_PUBLIC_RESPONSE_H
 
+#include "concepts.h"
 #include "types.h"
 #include <functional>
 #include <memory>
@@ -23,7 +24,7 @@ public:
    * @throws Error if a redundant send is attempted.
    * @returns Reference to this response for chaining
    */
-  template <typename T> Response &send(const T &data);
+  template <Sendable T> Response &send(const T &data);
 
   /**
    * Sends a nlohmann::json object to the client with the included data as serialized JSON string.
@@ -67,6 +68,24 @@ public:
   Response &set(const std::string &header, const std::string &value);
 
   /**
+   * Gets the specified response header.
+   * @param header
+   */
+  std::string get(const std::string &header);
+
+  /**
+   * @returns The HTTP status code.
+   * @note Deviates from Express.js API in the name of cpp best practices!
+   */
+  int status_code();
+
+  /**
+   * @returns A boolean indicating whether or not the response has been sent.
+   * @note Deviates from Express.js API in the name of cpp best practices!
+   */
+  bool headers_sent();
+
+  /**
    * Ends the response without sending any data.
    * @param header
    * @param value
@@ -80,11 +99,12 @@ public:
   Response(Response &&) = default;
   Response &operator=(Response &&) = default;
 
-private:
-  friend class Server;
+protected:
   explicit Response(std::function<void(const std::vector<char>)> write_to_socket,
                     std::function<void()> close_socket);
 
+private:
+  friend class Server;
   Response &json_str(const std::string &data);
 
   class Impl;
