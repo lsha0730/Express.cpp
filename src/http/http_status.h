@@ -14,6 +14,10 @@ public:
     }
   }
 
+  static bool is_valid(int status_code) {
+    return status_messages_.find(status_code) != status_messages_.end();
+  }
+
 private:
   static inline const std::unordered_map<int, std::string> status_messages_ = {
       {100, "Continue"},
