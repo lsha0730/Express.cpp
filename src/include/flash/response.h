@@ -35,8 +35,8 @@ public:
    * @returns Reference to this response for chaining
    */
   Response &json(const nlohmann::json &data) {
-    nlohmann::json s = data.dump(4);
-    return json_(std::move(s));
+    std::string serialized = data.dump(4);
+    return json_(std::move(serialized));
   }
 
   /**
@@ -51,8 +51,8 @@ public:
    * @returns Reference to this response for chaining
    */
   template <typename T> Response &json(const T &data) {
-    nlohmann::json s = nlohmann::json(data).dump(4);
-    return json_(std::move(s));
+    std::string serialized = nlohmann::json(data).dump(4);
+    return json_(std::move(serialized));
   }
 
   /**
