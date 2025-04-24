@@ -1,20 +1,23 @@
-// #include "request.h"
 #include "include/flash/response.h"
 #include "core/router.h"
+#include "http/byte_conversion.h"
 #include "http/http_status.h"
 #include "http/url_codec.h"
+#include "include/flash/concepts.h"
 #include "include/flash/metadata.h"
 
-#include <fmt/core.h>
+#include <algorithm>
+#include <ctime>
+#include <fmt/format.h>
 #include <functional>
-#include <map>
-#include <nlohmann/json.hpp>
+#include <iomanip>
+#include <memory>
 #include <sstream>
-#include <string>
+#include <stdexcept>
 #include <unordered_map>
-#include <variant>
 
 namespace flash {
+
 class Response::Impl {
 public:
   Impl(std::function<void(const std::vector<char>)> write_to_socket,
@@ -24,13 +27,57 @@ public:
     set_defaults();
   };
 
-  template <typename T> void send(const T &data) {
-    check_sendable();
-    set("Content-Type", "application/json; charset=utf-8", false);
-    send_bytes(data);
+  template <BufferLike T> void send(const T &body) {
+    set("Content-Type", "application/octet-stream");
+    std::vector<char> bytes = flash::to_bytes(body);
+    send_bytes(bytes);
   }
 
-  void json(const std::string &data) {
+  template <StringLike T> void send(const T &body) {
+    set("Content-Type", "text/html; charset=utf-8");
+    std::vector<char> bytes = flash::to_bytes(body);
+    send_bytes(bytes);
+  }
+
+  template <BoolLike T> void send(const T &body) {
+    set("Content-Type", "text/html; charset=utf-8");
+    std::vector<char> bytes = flash::to_bytes(std::to_string(body));
+    send_bytes(bytes);
+  }
+
+  template <NumberLike T> void send(const T &body) {
+    if constexpr (std::is_same<T, int>::value) {
+      if (HttpStatus::is_valid(body)) {
+        status(body);
+        send_bytes({});
+      }
+    }
+    set("Content-Type", "text/html; charset=utf-8");
+    std::vector<char> bytes = flash::to_bytes(std::to_string(body));
+    send_bytes(bytes);
+  }
+
+  template <NullLike T> void send(const T &body) { send_bytes({}); }
+
+  void send(const nlohmann::json &body) { json(body); }
+
+  template <ObjectLike T> void send(const T &body) {
+    set("Content-Type", "application/json; charset=utf-8");
+    std::string serialized = nlohmann::json(body).dump(4);
+    std::vector<char> bytes = flash::to_bytes(serialized);
+    send_bytes(bytes);
+  }
+
+  template <typename T> void send(const T &body) {
+    static_assert(sizeof(T) == 0, "flash::Response::send(): Unsupported type provided");
+  }
+
+  void json(const nlohmann::json &data) {
+    std::string serialized = data.dump(4);
+    json_str(serialized);
+  }
+
+  void json_str(const std::string &data) {
     check_sendable();
     set("Content-Type", "application/json; charset=utf-8", false);
     std::vector<char> bytes(data.begin(), data.end());
@@ -39,7 +86,7 @@ public:
 
   void status(int code) {
     status_code_ = code;
-    status_message_ = HttpStatus::getMessage(code);
+    status_message_ = HttpStatus::get_message(code);
   }
 
   /**
@@ -237,8 +284,13 @@ template <typename T> Response &send(const T &data) {
   // return *this;
 }
 
-Response &Response::json_(const std::string &data) {
+Response &Response::json(const nlohmann::json &data) {
   pImpl->json(data);
+  return *this;
+}
+
+Response &Response::json_str(const std::string &data) {
+  pImpl->json_str(data);
   return *this;
 }
 

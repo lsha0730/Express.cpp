@@ -34,10 +34,7 @@ public:
    * @throws Error if a redundant send is attempted.
    * @returns Reference to this response for chaining
    */
-  Response &json(const nlohmann::json &data) {
-    std::string serialized = data.dump(4);
-    return json_(std::move(serialized));
-  }
+  Response &json(const nlohmann::json &data);
 
   /**
    * Sends a response to the client with the included data as serialized JSON string.
@@ -52,7 +49,7 @@ public:
    */
   template <typename T> Response &json(const T &data) {
     std::string serialized = nlohmann::json(data).dump(4);
-    return json_(std::move(serialized));
+    return json_str(std::move(serialized));
   }
 
   /**
@@ -88,7 +85,7 @@ private:
   explicit Response(std::function<void(const std::vector<char>)> write_to_socket,
                     std::function<void()> close_socket);
 
-  Response &json_(const std::string &data);
+  Response &json_str(const std::string &data);
 
   class Impl;
   std::unique_ptr<Impl> pImpl;
