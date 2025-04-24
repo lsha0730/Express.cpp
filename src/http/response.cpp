@@ -41,7 +41,8 @@ public:
 
   template <BoolLike T> void send(const T &body) {
     set("Content-Type", "text/html; charset=utf-8");
-    std::vector<char> bytes = flash::to_bytes(std::to_string(body));
+    std::string serialized = (body) ? "true" : "false";
+    std::vector<char> bytes = flash::to_bytes(serialized);
     send_bytes(bytes);
   }
 
