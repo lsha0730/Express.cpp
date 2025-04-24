@@ -62,6 +62,31 @@ template <typename T>
 concept Json = std::same_as<std::decay_t<T>, nlohmann::json>;
 
 /**
+ * @brief Concept for raw C-style arrays
+ *
+ * RawArray types are fixed-size arrays declared with square brackets,
+ * such as:
+ * - char[10]
+ * - int[5]
+ * - std::byte[8]
+ */
+template <typename T>
+concept RawArray = std::is_array_v<T>;
+
+/**
+ * @brief Concept for pair or tuple-like types
+ *
+ * PairOrTuple types are containers that support std::tuple_size,
+ * which includes:
+ * - std::pair
+ * - std::tuple
+ */
+template <typename T>
+concept PairOrTuple = requires(T t) {
+  std::tuple_size<std::decay_t<T>>::value; // Supports tuple_size
+};
+
+/**
  * @brief Concept for map-like containers with string keys
  *
  * MapLike types are containers that have key-value pairs with string keys.
@@ -88,14 +113,6 @@ concept Iterable = (requires(T t) {
                      std::begin(t);
                      std::end(t);
                    } || RawArray<T>) && !StringLike<T> && !BufferLike<T> && !MapLike<T>;
-
-/**
- * @brief Concept for raw C-style arrays
- *
- * RawArray types are treated as a special case of iterable containers.
- */
-template <typename T>
-concept RawArray = std::is_array_v<T>;
 
 /**
  * @brief Concept for object-like types
