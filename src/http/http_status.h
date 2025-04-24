@@ -5,7 +5,7 @@
 namespace flash {
 class HttpStatus {
 public:
-  static std::string getMessage(int status_code) {
+  static std::string get_message(int status_code) {
     auto it = status_messages_.find(status_code);
     if (it != status_messages_.end()) {
       return it->second;
