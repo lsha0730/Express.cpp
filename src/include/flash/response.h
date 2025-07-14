@@ -16,7 +16,6 @@ class Response {
 public:
   /**
    * Sends a response to the client with the specified body content.
-   * @tparam T Type, either Buffer, String, Object, Array, or Number.
    * @param data The data to send.
    * @note Numbers are interpreted as status codes.
    * @note Infers the Content-Type header from the data type.
@@ -25,6 +24,29 @@ public:
    * @returns Reference to this response for chaining
    */
   template <Sendable T> Response &send(const T &data);
+
+  /**
+   * @brief Sends a raw string literal to the client.
+   *
+   * @tparam N    Size of the array (including the '\0' terminator).
+   * @param lit  The string literal to send.
+   * @return      Reference to this Response for chaining.
+   */
+  template <size_t N> Response &send(const char (&lit)[N]) { return send(std::string_view{lit}); }
+
+  /**
+   * @brief Fallback for types serializable to JSON (via nlohmann::json{T})
+   *        but not already handled by other send<> overloads.
+   *
+   * @tparam T     The type to serialize (must satisfy JsonLike and not Sendable).
+   * @param data   The object to JSON-serialize.
+   * @returns      Reference to this Response for chaining.
+   */
+  template <JsonLike T>
+    requires(!Sendable<T>)
+  Response &send(const T &data) {
+    return json(nlohmann::json{data});
+  }
 
   /**
    * Sends a nlohmann::json object to the client with the included data as serialized JSON string.
@@ -49,7 +71,7 @@ public:
    * @returns Reference to this response for chaining
    */
   template <typename T> Response &json(const T &data) {
-    std::string serialized = nlohmann::json(data).dump(4);
+    std::string serialized = nlohmann::json(data).dump(2);
     return json_str(std::move(serialized));
   }
 

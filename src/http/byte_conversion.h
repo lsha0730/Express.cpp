@@ -20,7 +20,7 @@ template <StringLike T> std::vector<char> to_bytes(const T &input) {
   if constexpr (std::is_same_v<std::decay_t<T>, char>) {
     data.push_back(input);
   } else if constexpr (std::is_same_v<std::decay_t<T>, std::filesystem::path>) {
-    std::string stringified(input);
+    std::string stringified = input.string();
     data.reserve(stringified.size());
     data.insert(data.end(), stringified.begin(), stringified.end());
   } else {

@@ -76,6 +76,12 @@ public:
     send_bytes(bytes);
   }
 
+  template <JsonLike T>
+    requires(!Sendable<T>)
+  void send(const T &data) {
+    json(nlohmann::json{data});
+  }
+
   void json(const nlohmann::json &data) {
     std::string serialized = data.dump(4);
     json_str(serialized);
@@ -359,7 +365,6 @@ template Response &Response::send<long double>(const long double &);
 // NullLike type
 template Response &Response::send<std::nullptr_t>(const std::nullptr_t &);
 
-// ObjectLike types - need to instantiate for common container types
 // MapLike types
 template Response &
 Response::send<std::map<std::string, std::string>>(const std::map<std::string, std::string> &);
@@ -370,15 +375,6 @@ template Response &Response::send<std::unordered_map<std::string, std::string>>(
 template Response &Response::send<std::vector<int>>(const std::vector<int> &);
 template Response &Response::send<std::vector<double>>(const std::vector<double> &);
 template Response &Response::send<std::vector<std::string>>(const std::vector<std::string> &);
-template Response &Response::send<std::set<int, std::less<int>, std::allocator<int>>>(
-    const std::set<int, std::less<int>, std::allocator<int>> &);
-template Response &
-Response::send<std::set<std::string, std::less<std::string>, std::allocator<std::string>>>(
-    const std::set<std::string, std::less<std::string>, std::allocator<std::string>> &);
-
-// Raw arrays
-template Response &Response::send<char[5]>(const char (&)[5]);
-template Response &Response::send<int[5]>(const int (&)[5]);
 
 // Json type
 template Response &Response::send<nlohmann::json>(const nlohmann::json &);

@@ -10,6 +10,7 @@ target_link_libraries(flash_tests
     flash
     GTest::gtest_main
     cpr::cpr
+    nlohmann_json::nlohmann_json
 )
 
 # Add include directories for tests

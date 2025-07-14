@@ -32,8 +32,10 @@ concept BufferLike = std::same_as<std::decay_t<T>, std::vector<char>> ||
 template <typename T>
 concept StringLike =
     std::convertible_to<T, std::string_view> ||
-    std::same_as<std::decay_t<T>, char> ||                // Treat char like string
-    std::same_as<std::decay_t<T>, std::filesystem::path>; // Filesystem path as string
+    std::same_as<std::decay_t<T>, char> ||                  // Treat char like string
+    std::same_as<std::decay_t<T>, std::filesystem::path> || // Filesystem path as string
+    (std::is_array_v<T> &&
+     std::same_as<std::remove_extent_t<T>, const char>); // char arrays (string literals)
 
 /**
  * @brief Concept for boolean values
@@ -123,16 +125,17 @@ template <typename T>
 concept ObjectLike = MapLike<T> || Iterable<T>;
 
 /**
+ * @brief Concept for JSON-convertible types
+ */
+template <typename T>
+concept JsonLike = requires(T t) {
+  { nlohmann::json{t} } -> std::same_as<nlohmann::json>;
+};
+
+/**
  * @brief Concept for all types that can be sent in a response
  *
- * Sendable types include all the basic response types:
- * - BufferLike (raw binary)
- * - StringLike (text)
- * - BoolLike (boolean)
- * - NumberLike (status codes)
- * - NullLike (null values)
- * - ObjectLike (containers)
- * - Json (JSON objects)
+ * Sendable types include all the basic response types.
  */
 template <typename T>
 concept Sendable = BufferLike<T> || StringLike<T> || BoolLike<T> || NumberLike<T> || NullLike<T> ||
