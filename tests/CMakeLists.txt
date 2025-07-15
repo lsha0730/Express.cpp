@@ -5,6 +5,8 @@ file(GLOB_RECURSE TEST_SOURCES
 # tests/CMakeLists.txt
 add_executable(flash_tests ${TEST_SOURCES})
 
+find_package(cpr REQUIRED)
+
 target_link_libraries(flash_tests
     PRIVATE
     flash

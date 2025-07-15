@@ -13,24 +13,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Enable testing
 include(CTest)
 enable_testing()
-add_subdirectory(third_party/googletest)
-add_subdirectory(third_party/cpr)
 
-# Fetch dependencies
-include(FetchContent)
-
-FetchContent_Declare(
-  fmt
-  GIT_REPOSITORY https://github.com/fmtlib/fmt
-  GIT_TAG        e69e5f977d458f2650bb346dadf2ad30c5320281) # 10.2.1
-
-FetchContent_Declare(
-  json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG v3.11.2
-)
-
-FetchContent_MakeAvailable(fmt json)
+# Get dependencies from Conan
+find_package(fmt REQUIRED)
+find_package(nlohmann_json REQUIRED)
+find_package(GTest REQUIRED)
 
 # Find all source files for the library
 file(GLOB_RECURSE FLASH_SOURCES 
@@ -50,7 +37,6 @@ target_include_directories(flash
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
-        $<TARGET_PROPERTY:fmt::fmt,INTERFACE_INCLUDE_DIRECTORIES>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
@@ -80,7 +66,6 @@ target_link_libraries(flash_server PRIVATE
 target_include_directories(flash_server
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-        $<TARGET_PROPERTY:nlohmann_json::nlohmann_json,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 # Add compile options for the executable
@@ -92,7 +77,10 @@ target_compile_options(flash_server
 )
 
 # Add tests directory
-add_subdirectory(tests)
+option(BUILD_TESTING "Build tests" ON)
+if (BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
 
 # Installation rules
 include(GNUInstallDirs)
