@@ -32,6 +32,10 @@ private:
   std::unique_ptr<Impl> pImpl;
 };
 
+inline Express express() {
+  return Express::express();
+}
+
 } // namespace express
 
 #endif

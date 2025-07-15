@@ -6,30 +6,12 @@
 #include <string>
 #include <vector>
 
-struct Job {
-  int tc;
-  std::string company;
-
-  EXPRESS_REGISTER_STRUCT_INTRUSIVE(Job, tc, company);
-};
-
-struct Person {
-  int age;
-  std::string name;
-  Job job;
-
-  EXPRESS_REGISTER_STRUCT_INTRUSIVE(Person, age, name, job);
-};
-
 int main() {
-  auto app = express::Express::express();
-
-  Job amzn = {160000, "Amazon"};
-  Person lincoln = {21, "Lincoln", amzn};
+  auto app = express::express();
 
   // Define routes
-  app.get("/", [lincoln](const express::Request &req, express::Response &res) {
-    res.status(200).send("hello everybody!");
+  app.get("/", [](const express::Request &req, express::Response &res) {
+    res.status(200).send("Hello world!");
   });
 
   return 0;
