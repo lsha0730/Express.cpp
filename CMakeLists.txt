@@ -17,7 +17,6 @@ enable_testing()
 # Get dependencies from Conan
 find_package(fmt REQUIRED)
 find_package(nlohmann_json REQUIRED)
-find_package(GTest REQUIRED)
 
 # Find all source files for the library
 file(GLOB_RECURSE FLASH_SOURCES 
@@ -55,47 +54,23 @@ target_link_libraries(flash PRIVATE
     nlohmann_json::nlohmann_json
 )
 
-# Create executable that uses the library
-add_executable(flash_server src/main.cpp)
-target_link_libraries(flash_server PRIVATE 
-    flash
-    nlohmann_json::nlohmann_json
-)
-
-# Add include directories for the executable
-target_include_directories(flash_server
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
-
-# Add compile options for the executable
-target_compile_options(flash_server
-    PRIVATE
-        $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic>
-        $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic>
-        $<$<CXX_COMPILER_ID:MSVC>:/W4>
-)
-
-# Add tests directory
-option(BUILD_TESTING "Build tests" ON)
-if (BUILD_TESTING)
+# Add tests directory if building locally
+if (EXISTS "${CMAKE_SOURCE_DIR}/tests")
     add_subdirectory(tests)
 endif()
-
-# Installation rules
-include(GNUInstallDirs)
-install(TARGETS flash flash_server
-    EXPORT flashTargets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
 
 # Install headers
 install(
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(TARGETS flash
+    EXPORT flashTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 # Generate and install export files

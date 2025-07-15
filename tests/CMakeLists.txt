@@ -6,6 +6,7 @@ file(GLOB_RECURSE TEST_SOURCES
 add_executable(flash_tests ${TEST_SOURCES})
 
 find_package(cpr REQUIRED)
+find_package(GTest REQUIRED)
 
 target_link_libraries(flash_tests
     PRIVATE
