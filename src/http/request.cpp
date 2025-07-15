@@ -1,10 +1,8 @@
-// #include "request.h"
-#include "include/flash/request.h"
 #include "http/url_codec.h"
+#include <flash/request.h>
 
 namespace flash {
 class RequestParser {
-
 public:
   static void parse(Request &request, std::string_view raw_request) {
     SplitRequest split = split_request(raw_request);
@@ -51,14 +49,13 @@ private:
       }
     }
     int body_start_index = left + 2;
-    std::string_view body = raw_request.substr(
-        body_start_index, raw_request.length() - body_start_index);
+    std::string_view body =
+        raw_request.substr(body_start_index, raw_request.length() - body_start_index);
 
     return SplitRequest{request_line, headers, body};
   }
 
-  static void parse_request_line(Request &request,
-                                 std::string_view request_line) {
+  static void parse_request_line(Request &request, std::string_view request_line) {
     int left = 0;
     std::vector<std::string_view> parts;
     for (int i = 0; i < request_line.length(); i++) {
@@ -71,8 +68,7 @@ private:
     }
     parts.push_back(request_line.substr(left, request_line.length() - left));
     if (parts.size() != 3)
-      throw std::invalid_argument(
-          "Request line does not have exactly three components");
+      throw std::invalid_argument("Request line does not have exactly three components");
     request.method = parts[0];
     request.original_url = parts[1];
     request.http_version = parts[2];
@@ -91,8 +87,7 @@ private:
         param_end = query.length();
       }
 
-      std::string_view param =
-          query.substr(param_start, param_end - param_start);
+      std::string_view param = query.substr(param_start, param_end - param_start);
 
       size_t equals_pos = param.find('=');
       if (equals_pos != std::string::npos) {
@@ -116,21 +111,19 @@ private:
     }
     request.path = request.original_url.substr(0, question_mark_index);
 
-    std::string_view query =
-        std::string_view(request.original_url).substr(question_mark_index + 1);
+    std::string_view query = std::string_view(request.original_url).substr(question_mark_index + 1);
     return query;
   }
 
-  static void parse_headers(Request &request,
-                            std::vector<std::string_view> header_lines) {
+  static void parse_headers(Request &request, std::vector<std::string_view> header_lines) {
     for (std::string_view header : header_lines) {
       for (int i = 0; i < header.length(); i++) {
         char c = header.at(i);
         if (c == HEADER_DELIMITER) {
           std::string key = std::string(header.substr(0, i));
           int value_start_index = i + 2;
-          std::string value = std::string(header.substr(
-              value_start_index, header.length() - value_start_index));
+          std::string value =
+              std::string(header.substr(value_start_index, header.length() - value_start_index));
           request.headers[key] = value;
           break;
         }

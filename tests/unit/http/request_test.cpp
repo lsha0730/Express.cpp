@@ -1,4 +1,4 @@
-#include "include/flash/request.h"
+#include <flash/request.h>
 #include <gtest/gtest.h>
 
 namespace flash {
@@ -188,16 +188,14 @@ TEST(RequestTest, RequestWithFragment) {
 
 // Test parsing of URL-encoded parameters
 TEST(RequestTest, RequestWithEncodedParameters) {
-  std::string raw_request =
-      "GET /search?q=hello+world&category=books%20%26%20media HTTP/1.1\r\n"
-      "Host: example.com\r\n"
-      "\r\n";
+  std::string raw_request = "GET /search?q=hello+world&category=books%20%26%20media HTTP/1.1\r\n"
+                            "Host: example.com\r\n"
+                            "\r\n";
 
   Request request(raw_request);
 
   EXPECT_EQ(request.method, "GET");
-  EXPECT_EQ(request.original_url,
-            "/search?q=hello+world&category=books%20%26%20media");
+  EXPECT_EQ(request.original_url, "/search?q=hello+world&category=books%20%26%20media");
   EXPECT_EQ(request.path, "/search");
   EXPECT_EQ(request.params.size(), 2);
   EXPECT_EQ(request.params["q"], "hello world");
@@ -222,10 +220,9 @@ TEST(RequestTest, RequestWithEmptyParameterValues) {
 
 // Test parsing parameters with special characters
 TEST(RequestTest, RequestWithSpecialCharactersInParameters) {
-  std::string raw_request =
-      "GET /search?q=%E6%97%A5%E6%9C%AC%E8%AA%9E&year=2023-2024 HTTP/1.1\r\n"
-      "Host: example.com\r\n"
-      "\r\n";
+  std::string raw_request = "GET /search?q=%E6%97%A5%E6%9C%AC%E8%AA%9E&year=2023-2024 HTTP/1.1\r\n"
+                            "Host: example.com\r\n"
+                            "\r\n";
 
   Request request(raw_request);
 
@@ -261,12 +258,11 @@ TEST(RequestTest, RequestWithComplexQueryString) {
 
 // Test parsing POST request with both URL parameters and body
 TEST(RequestTest, PostRequestWithUrlParameters) {
-  std::string raw_request =
-      "POST /submit?source=web&ref=homepage HTTP/1.1\r\n"
-      "Host: example.com\r\n"
-      "Content-Type: application/x-www-form-urlencoded\r\n"
-      "\r\n"
-      "name=John&email=john%40example.com";
+  std::string raw_request = "POST /submit?source=web&ref=homepage HTTP/1.1\r\n"
+                            "Host: example.com\r\n"
+                            "Content-Type: application/x-www-form-urlencoded\r\n"
+                            "\r\n"
+                            "name=John&email=john%40example.com";
 
   Request request(raw_request);
 

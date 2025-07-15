@@ -8,9 +8,9 @@
 #include <vector>
 
 #include "core/router.h"
-#include "include/flash/types.h"
 #include "net/flash_networking.h"
 #include "utils/constants.h"
+#include <flash/types.h>
 
 namespace flash {
 class Server {
