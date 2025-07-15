@@ -1,11 +1,11 @@
-#ifndef FLASH_LISTENING_SOCKET_H
-#define FLASH_LISTENING_SOCKET_H
+#ifndef EXPRESS_LISTENING_SOCKET_H
+#define EXPRESS_LISTENING_SOCKET_H
 
 #include <stdio.h>
 
 #include "binding_socket.h"
 
-namespace flash {
+namespace express {
 class ListeningSocket : public BindingSocket {
 public:
   ListeningSocket(SocketConfig config);
@@ -15,6 +15,6 @@ private:
   int backlog_;
   int listening_;
 };
-} // namespace flash
+} // namespace express
 
 #endif

@@ -2,9 +2,9 @@
 #include "http/byte_conversion.h"
 #include "http/http_status.h"
 #include "http/url_codec.h"
-#include <flash/concepts.h>
-#include <flash/metadata.h>
-#include <flash/response.h>
+#include <express/concepts.h>
+#include <express/metadata.h>
+#include <express/response.h>
 
 #include <algorithm>
 #include <ctime>
@@ -16,7 +16,7 @@
 #include <stdexcept>
 #include <unordered_map>
 
-namespace flash {
+namespace express {
 
 class Response::Impl {
 public:
@@ -31,7 +31,7 @@ public:
 
   template <BufferLike T> void send(const T &body) {
     set("Content-Type", "application/octet-stream");
-    std::vector<char> bytes = flash::to_bytes(body);
+    std::vector<char> bytes = express::to_bytes(body);
     send_bytes(bytes);
   }
 
@@ -39,7 +39,7 @@ public:
     requires(!BufferLike<T> && !NullLike<T>)
   void send(const T &body) {
     set("Content-Type", "text/html; charset=utf-8");
-    std::vector<char> bytes = flash::to_bytes(body);
+    std::vector<char> bytes = express::to_bytes(body);
     send_bytes(bytes);
   }
 
@@ -48,7 +48,7 @@ public:
   void send(const T &body) {
     set("Content-Type", "text/html; charset=utf-8");
     std::string serialized = (body) ? "true" : "false";
-    std::vector<char> bytes = flash::to_bytes(serialized);
+    std::vector<char> bytes = express::to_bytes(serialized);
     send_bytes(bytes);
   }
 
@@ -63,7 +63,7 @@ public:
       }
     }
     set("Content-Type", "text/html; charset=utf-8");
-    std::vector<char> bytes = flash::to_bytes(std::to_string(body));
+    std::vector<char> bytes = express::to_bytes(std::to_string(body));
     send_bytes(bytes);
   }
 
@@ -72,7 +72,7 @@ public:
   template <ObjectLike T> void send(const T &body) {
     set("Content-Type", "application/json; charset=utf-8");
     std::string serialized = nlohmann::json(body).dump(4);
-    std::vector<char> bytes = flash::to_bytes(serialized);
+    std::vector<char> bytes = express::to_bytes(serialized);
     send_bytes(bytes);
   }
 
@@ -379,4 +379,4 @@ template Response &Response::send<std::vector<std::string>>(const std::vector<st
 // Json type
 template Response &Response::send<nlohmann::json>(const nlohmann::json &);
 
-} // namespace flash
+} // namespace express

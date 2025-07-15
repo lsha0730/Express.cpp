@@ -1,7 +1,7 @@
 #include "http/url_codec.h"
 #include <gtest/gtest.h>
 
-namespace flash {
+namespace express {
 namespace test {
 
 // Test basic URL decoding
@@ -52,8 +52,7 @@ TEST(UrlCodecTest, MultipleUtf8Characters) {
 // Test with URL having query parameters containing UTF-8
 TEST(UrlCodecTest, QueryParamsWithUtf8) {
   UrlCodec codec;
-  std::string encoded =
-      "/search?q=%E6%B1%82%E8%81%8C&lang=zh"; // "/search?q=求职&lang=zh"
+  std::string encoded = "/search?q=%E6%B1%82%E8%81%8C&lang=zh"; // "/search?q=求职&lang=zh"
   std::string decoded = codec.decode(encoded);
 
   EXPECT_EQ(decoded, "/search?q=求职&lang=zh");
@@ -121,4 +120,4 @@ TEST(UrlCodecTest, MalformedUtf8Sequence) {
 }
 
 } // namespace test
-} // namespace flash
+} // namespace express

@@ -1,7 +1,7 @@
-#ifndef FLASH_CONSTANTS_H
-#define FLASH_CONSTANTS_H
+#ifndef EXPRESS_CONSTANTS_H
+#define EXPRESS_CONSTANTS_H
 
-namespace flash {
+namespace express {
 namespace constants {
 // Size constants
 static constexpr size_t KB_ = 1024;
@@ -22,6 +22,6 @@ static constexpr int DEFAULT_PROTOCOL = 0;
 static constexpr u_long DEFAULT_INTERFACE = INADDR_ANY;
 static constexpr int DEFAULT_BACKLOG = 511;
 } // namespace constants
-} // namespace flash
+} // namespace express
 
 #endif

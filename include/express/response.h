@@ -1,5 +1,5 @@
-#ifndef FLASH_PUBLIC_RESPONSE_H
-#define FLASH_PUBLIC_RESPONSE_H
+#ifndef EXPRESS_PUBLIC_RESPONSE_H
+#define EXPRESS_PUBLIC_RESPONSE_H
 
 #include "concepts.h"
 #include "types.h"
@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace flash {
+namespace express {
 class Server;
 
 class Response {
@@ -62,7 +62,7 @@ public:
   /**
    * Sends a response to the client with the included data as serialized JSON string.
    * @warning Any structs that are passed in must be registered with one of
-   * FLASH_REGISTER_STRUCT_INTRUSIVE or FLASH_REGISTER_STRUCT_NON_INTRUSIVE.
+   * EXPRESS_REGISTER_STRUCT_INTRUSIVE or EXPRESS_REGISTER_STRUCT_NON_INTRUSIVE.
    * @tparam T Type that can be converted to JSON
    * @param data The data to send.
    * @note Sets Content-Type header to "application/json; charset=utf-8".
@@ -133,6 +133,6 @@ private:
   std::unique_ptr<Impl> pImpl;
 };
 
-} // namespace flash
+} // namespace express
 
 #endif

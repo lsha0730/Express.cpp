@@ -1,5 +1,5 @@
-#ifndef FLASH_SERVER_H
-#define FLASH_SERVER_H
+#ifndef EXPRESS_SERVER_H
+#define EXPRESS_SERVER_H
 
 #include <memory>
 #include <stdio.h>
@@ -8,11 +8,11 @@
 #include <vector>
 
 #include "core/router.h"
-#include "net/flash_networking.h"
+#include "net/express_networking.h"
 #include "utils/constants.h"
-#include <flash/types.h>
+#include <express/types.h>
 
-namespace flash {
+namespace express {
 class Server {
 public:
   Server(SocketConfig config, Router router);
@@ -90,8 +90,8 @@ private:
    * @private
    * @return Pointer to the parsed Request object.
    */
-  std::unique_ptr<flash::Request> read_request();
+  std::unique_ptr<express::Request> read_request();
 };
-}; // namespace flash
+}; // namespace express
 
 #endif

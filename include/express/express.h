@@ -1,15 +1,15 @@
-#ifndef FLASH_PUBLIC_H
-#define FLASH_PUBLIC_H
+#ifndef EXPRESS_PUBLIC_H
+#define EXPRESS_PUBLIC_H
 
 #include "types.h"
 #include <functional>
 #include <memory>
 #include <string>
 
-namespace flash {
-class Flash {
+namespace express {
+class Express {
 public:
-  static Flash flash();
+  static Express express();
   void listen(int port, Callback callback = Callback());
   void shutdown();
 
@@ -20,18 +20,18 @@ public:
   void del(std::string route, Handler handler);
 
   // Rule of 5
-  ~Flash();
-  Flash(const Flash &) = delete;
-  Flash &operator=(const Flash &) = delete;
-  Flash(Flash &&) = default;
-  Flash &operator=(Flash &&) = default;
+  ~Express();
+  Express(const Express &) = delete;
+  Express &operator=(const Express &) = delete;
+  Express(Express &&) = default;
+  Express &operator=(Express &&) = default;
 
 private:
-  Flash();
+  Express();
   class Impl;
   std::unique_ptr<Impl> pImpl;
 };
 
-} // namespace flash
+} // namespace express
 
 #endif

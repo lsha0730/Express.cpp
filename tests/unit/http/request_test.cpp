@@ -1,7 +1,7 @@
-#include <flash/request.h>
+#include <express/request.h>
 #include <gtest/gtest.h>
 
-namespace flash {
+namespace express {
 namespace test {
 
 // Test a basic GET request
@@ -289,4 +289,4 @@ TEST(RequestTest, RequestWithNoParameters) {
 }
 
 } // namespace test
-} // namespace flash
+} // namespace express

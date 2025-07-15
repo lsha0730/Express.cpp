@@ -1,6 +1,6 @@
 #include "url_codec.h"
 
-std::string flash::UrlCodec::decode(std::string_view input) {
+std::string express::UrlCodec::decode(std::string_view input) {
   std::string output;
   output.reserve(input.length());
   for (int i = 0; i < input.length(); i++) {
@@ -32,13 +32,12 @@ std::string flash::UrlCodec::decode(std::string_view input) {
   return output;
 }
 
-bool flash::UrlCodec::is_valid_hex_digit(char c) {
-  return ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') ||
-          (c >= 'a' && c <= 'f'));
+bool express::UrlCodec::is_valid_hex_digit(char c) {
+  return ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'));
 }
 
-flash::UrlCodec::utf8_decoded
-flash::UrlCodec::decode_percent_encoding(std::string_view str, int i) {
+express::UrlCodec::utf8_decoded express::UrlCodec::decode_percent_encoding(std::string_view str,
+                                                                           int i) {
   if (i + 2 >= str.length()) {
     throw std::out_of_range("Not enough bytes to read into UTF8!");
   }
@@ -72,7 +71,7 @@ flash::UrlCodec::decode_percent_encoding(std::string_view str, int i) {
   return {utf8, i - 1}; // -1 because the main loop will increment i
 }
 
-std::string flash::UrlCodec::hex_to_utf8(const std::string &hex_str) {
+std::string express::UrlCodec::hex_to_utf8(const std::string &hex_str) {
   std::string result;
   for (size_t i = 0; i < hex_str.length(); i += 2) {
     std::string byte = hex_str.substr(i, 2);
@@ -82,7 +81,7 @@ std::string flash::UrlCodec::hex_to_utf8(const std::string &hex_str) {
   return result;
 }
 
-int flash::UrlCodec::get_utf8_sequence_length(unsigned char first_byte) {
+int express::UrlCodec::get_utf8_sequence_length(unsigned char first_byte) {
   if ((first_byte & 0x80) == 0)
     return 1; // 0xxxxxxx (ASCII)
   if ((first_byte & 0xE0) == 0xC0)

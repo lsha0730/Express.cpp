@@ -1,16 +1,16 @@
-#ifndef FLASH_ROUTER_H
-#define FLASH_ROUTER_H
+#ifndef EXPRESS_ROUTER_H
+#define EXPRESS_ROUTER_H
 
 #include "http/http_verb.h"
-#include <flash/request.h>
-#include <flash/response.h>
-#include <flash/types.h>
+#include <express/request.h>
+#include <express/response.h>
+#include <express/types.h>
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
 
-namespace flash {
+namespace express {
 class Router {
 public:
   Router();
@@ -32,6 +32,6 @@ private:
   std::map<std::string, Router> subrouters_;
   // TODO: Middleware stack
 };
-} // namespace flash
+} // namespace express
 
 #endif

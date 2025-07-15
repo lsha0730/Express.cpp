@@ -2,8 +2,8 @@ from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMakeDeps, cmake_layout, CMake
 from conan.tools.build import check_min_cppstd
 
-class FlashConan(ConanFile):
-    name            = "flash"
+class ExpressConan(ConanFile):
+    name            = "express"
     version         = "0.1.0"
     license         = "MIT"
     author          = "Lincoln <lsha0730@gmail.com>"
@@ -36,7 +36,7 @@ class FlashConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["flash"]
+        self.cpp_info.libs = ["express"]
         self.cpp_info.requires = ["nlohmann_json::nlohmann_json", "fmt::fmt"]
 
     def validate(self):

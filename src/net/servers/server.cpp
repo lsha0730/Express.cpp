@@ -1,16 +1,16 @@
 #include "server.h"
 
-flash::Server::Server(SocketConfig config, Router router) {
+express::Server::Server(SocketConfig config, Router router) {
   socket_ = new ListeningSocket(config);
   router_ = router;
 }
 
-flash::Server::~Server() {
+express::Server::~Server() {
   stop();
   delete socket_;
 }
 
-std::unique_ptr<flash::Request> flash::Server::read_request() {
+std::unique_ptr<express::Request> express::Server::read_request() {
   struct sockaddr_in address = socket()->address();
   int addrlen = sizeof(address);
   new_socket_ = accept(socket()->sock(), (struct sockaddr *)&address, (socklen_t *)&addrlen);
@@ -22,7 +22,7 @@ std::unique_ptr<flash::Request> flash::Server::read_request() {
   return std::make_unique<Request>(raw_request);
 }
 
-int flash::Server::read_socket(std::vector<char> &buffer) {
+int express::Server::read_socket(std::vector<char> &buffer) {
   int total_bytes_read = 0;
   std::vector<char> chunk(CHUNK_SIZE_);
 
@@ -33,7 +33,7 @@ int flash::Server::read_socket(std::vector<char> &buffer) {
     if (bytes_read <= 0)
       break;
 
-    if (buffer.size() + bytes_read > flash::constants::MAX_REQUEST_SIZE_)
+    if (buffer.size() + bytes_read > express::constants::MAX_REQUEST_SIZE_)
       break;
 
     buffer.insert(buffer.end(), chunk.begin(), chunk.begin() + bytes_read);
@@ -45,15 +45,15 @@ int flash::Server::read_socket(std::vector<char> &buffer) {
   return total_bytes_read;
 }
 
-void flash::Server::write_socket(std::vector<char> content) {
+void express::Server::write_socket(std::vector<char> content) {
   write(new_socket_, content.data(), content.size());
 }
 
-void flash::Server::close_socket() {
+void express::Server::close_socket() {
   close(new_socket_);
 }
 
-void flash::Server::handle_connection() {
+void express::Server::handle_connection() {
   std::unique_ptr<Request> request = read_request();
   Response response(
       [this](const std::vector<char> &data) {
@@ -65,18 +65,18 @@ void flash::Server::handle_connection() {
   router_.run(*request, response);
 }
 
-flash::ListeningSocket *flash::Server::socket() {
+express::ListeningSocket *express::Server::socket() {
   return socket_;
 }
 
-void flash::Server::launch() {
+void express::Server::launch() {
   if (is_running)
     return;
   is_running = true;
   server_thread_ = std::thread(&Server::run, this);
 }
 
-void flash::Server::run() {
+void express::Server::run() {
   while (is_running) {
     fd_set readfds;
     FD_ZERO(&readfds);
@@ -95,7 +95,7 @@ void flash::Server::run() {
   }
 }
 
-void flash::Server::stop() {
+void express::Server::stop() {
   if (!is_running)
     return;
   is_running = false;

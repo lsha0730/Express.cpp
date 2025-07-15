@@ -1,5 +1,5 @@
-#ifndef FLASH_PUBLIC_REQUEST_H
-#define FLASH_PUBLIC_REQUEST_H
+#ifndef EXPRESS_PUBLIC_REQUEST_H
+#define EXPRESS_PUBLIC_REQUEST_H
 
 #include "types.h"
 #include <functional>
@@ -8,7 +8,7 @@
 #include <string>
 #include <string_view>
 
-namespace flash {
+namespace express {
 class Request {
 public:
   /**
@@ -35,6 +35,6 @@ public:
   Request &operator=(Request &&) = default;
 };
 
-} // namespace flash
+} // namespace express
 
 #endif
