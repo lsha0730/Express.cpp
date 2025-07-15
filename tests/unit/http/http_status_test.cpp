@@ -1,7 +1,7 @@
 #include "http/http_status.h"
 #include <gtest/gtest.h>
 
-namespace flash {
+namespace express {
 namespace test {
 
 TEST(HttpStatusClass, RudimentaryTest) {
@@ -13,4 +13,4 @@ TEST(HttpStatusClass, RudimentaryTest) {
 }
 
 } // namespace test
-} // namespace flash
+} // namespace express

@@ -1,5 +1,5 @@
-#ifndef FLASH_SOCKET_H
-#define FLASH_SOCKET_H
+#ifndef EXPRESS_SOCKET_H
+#define EXPRESS_SOCKET_H
 
 #include "socket_error.h"
 #include <iostream>
@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <sys/socket.h>
 
-namespace flash {
+namespace express {
 struct SocketConfig {
   int domain;
   int service;
@@ -32,6 +32,6 @@ private:
   int sock_;
   int connection_;
 };
-} // namespace flash
+} // namespace express
 
 #endif

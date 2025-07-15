@@ -1,20 +1,20 @@
 #include "core/router.h"
 #include "net/servers/server.h"
 #include "utils/constants.h"
-#include <flash/flash.h>
+#include <express/express.h>
 #include <memory>
 
-namespace flash {
+namespace express {
 
 // Define the implementation class
-class Flash::Impl : public Router {
+class Express::Impl : public Router {
 public:
   Impl() = default;
 
   void listen(int port, Callback callback) {
-    using namespace flash::constants;
-    flash::SocketConfig config = {DEFAULT_DOMAIN, DEFAULT_SERVICE,   DEFAULT_PROTOCOL,
-                                  port,           DEFAULT_INTERFACE, DEFAULT_BACKLOG};
+    using namespace express::constants;
+    express::SocketConfig config = {DEFAULT_DOMAIN, DEFAULT_SERVICE,   DEFAULT_PROTOCOL,
+                                    port,           DEFAULT_INTERFACE, DEFAULT_BACKLOG};
     server_ = std::make_unique<Server>(config, *this);
     server_->launch();
     callback();
@@ -45,40 +45,40 @@ private:
 };
 
 // Constructor
-Flash::Flash() : pImpl(std::make_unique<Impl>()) {
+Express::Express() : pImpl(std::make_unique<Impl>()) {
 }
 
 // Destructor (can be defaulted since unique_ptr handles cleanup)
-Flash::~Flash() = default;
+Express::~Express() = default;
 
 // Factory function
-Flash Flash::flash() {
-  return Flash();
+Express Express::express() {
+  return Express();
 }
 
 // Method implementations
-void Flash::listen(int port, Callback callback) {
+void Express::listen(int port, Callback callback) {
   pImpl->listen(port, std::move(callback));
 }
 
-void Flash::shutdown() {
+void Express::shutdown() {
   pImpl->shutdown();
 }
 
-void Flash::get(std::string route, Handler handler) {
+void Express::get(std::string route, Handler handler) {
   pImpl->get(route, std::move(handler));
 }
 
-void Flash::post(std::string route, Handler handler) {
+void Express::post(std::string route, Handler handler) {
   pImpl->post(route, std::move(handler));
 }
 
-void Flash::put(std::string route, Handler handler) {
+void Express::put(std::string route, Handler handler) {
   pImpl->put(route, std::move(handler));
 }
 
-void Flash::del(std::string route, Handler handler) {
+void Express::del(std::string route, Handler handler) {
   pImpl->del(route, std::move(handler));
 }
 
-} // namespace flash
+} // namespace express

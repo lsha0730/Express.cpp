@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 // Default constructor
-flash::Socket::Socket(SocketConfig config) {
+express::Socket::Socket(SocketConfig config) {
   // Define address structure
   address_.sin_family = config.domain;
   address_.sin_port = htons(config.port);
@@ -21,14 +21,14 @@ flash::Socket::Socket(SocketConfig config) {
   setsockopt(sock_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 }
 
-flash::Socket::~Socket() {
+express::Socket::~Socket() {
   if (sock_ > 0) {
     close(sock_);
   }
 }
 
 // Test connection virtual function
-void flash::Socket::test_connection(int item_to_test) {
+void express::Socket::test_connection(int item_to_test) {
   if (item_to_test < 0) {
     std::string error_msg = "Socket operation failed: ";
     error_msg += std::strerror(errno);
@@ -37,9 +37,15 @@ void flash::Socket::test_connection(int item_to_test) {
 }
 
 // Getter functions
-struct sockaddr_in flash::Socket::address() { return address_; }
+struct sockaddr_in express::Socket::address() {
+  return address_;
+}
 
-int flash::Socket::sock() { return sock_; }
+int express::Socket::sock() {
+  return sock_;
+}
 
 // Setter functions
-void flash::Socket::set_connection(int con) { connection_ = con; }
+void express::Socket::set_connection(int con) {
+  connection_ = con;
+}

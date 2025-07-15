@@ -1,5 +1,5 @@
-#ifndef FLASH_CONCEPTS_H
-#define FLASH_CONCEPTS_H
+#ifndef EXPRESS_CONCEPTS_H
+#define EXPRESS_CONCEPTS_H
 
 #include <concepts>
 #include <filesystem>
@@ -10,7 +10,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace flash {
+namespace express {
 /**
  * @brief Concept for contiguous byte containers that can be sent as raw binary data
  *
@@ -140,6 +140,6 @@ concept JsonLike = requires(T t) {
 template <typename T>
 concept Sendable = BufferLike<T> || StringLike<T> || BoolLike<T> || NumberLike<T> || NullLike<T> ||
                    ObjectLike<T> || Json<T>;
-} // namespace flash
+} // namespace express
 
 #endif

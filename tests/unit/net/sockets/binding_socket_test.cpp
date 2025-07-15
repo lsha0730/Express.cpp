@@ -1,7 +1,7 @@
 #include "net/sockets/binding_socket.h"
 #include <gtest/gtest.h>
 
-namespace flash {
+namespace express {
 namespace test {
 
 /**
@@ -10,11 +10,11 @@ namespace test {
  */
 class BindingSocketFixture : public ::testing::Test {
 protected:
-  std::unique_ptr<flash::BindingSocket> socket;
+  std::unique_ptr<express::BindingSocket> socket;
 
   void SetUp() override {
-    flash::SocketConfig config = {AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY};
-    socket = std::make_unique<flash::BindingSocket>(config);
+    express::SocketConfig config = {AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY};
+    socket = std::make_unique<express::BindingSocket>(config);
   }
 
   ~BindingSocketFixture() noexcept override = default;
@@ -58,4 +58,4 @@ TEST_F(BindingSocketFixture, SocketIsBoundAfterInitialization) {
 }
 
 } // namespace test
-} // namespace flash
+} // namespace express

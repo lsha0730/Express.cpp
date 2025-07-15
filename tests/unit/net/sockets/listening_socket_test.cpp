@@ -4,7 +4,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-namespace flash {
+namespace express {
 namespace test {
 
 constexpr int SERVER_PORT = 8080;
@@ -17,11 +17,11 @@ constexpr int BACKLOG = 3;
  */
 class ListeningSocketFixture : public ::testing::Test {
 protected:
-  std::unique_ptr<flash::ListeningSocket> server_socket;
+  std::unique_ptr<express::ListeningSocket> server_socket;
 
   void SetUp() override {
-    flash::SocketConfig config = {AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY};
-    server_socket = std::make_unique<flash::ListeningSocket>(config);
+    express::SocketConfig config = {AF_INET, SOCK_STREAM, 0, 8080, INADDR_ANY};
+    server_socket = std::make_unique<express::ListeningSocket>(config);
   }
 
   ~ListeningSocketFixture() noexcept override = default;
@@ -39,13 +39,11 @@ TEST_F(ListeningSocketFixture, SocketIsListeningAfterInit) {
   server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
   // Try to connect to the server
-  int connect_result = connect(client_sock, (struct sockaddr *)&server_addr,
-                               sizeof(server_addr));
+  int connect_result = connect(client_sock, (struct sockaddr *)&server_addr, sizeof(server_addr));
 
   // The connection should either succeed or fail with EINPROGRESS/EWOULDBLOCK
   // Both indicate the socket is listening
-  EXPECT_TRUE(connect_result == 0 || errno == EINPROGRESS ||
-              errno == EWOULDBLOCK)
+  EXPECT_TRUE(connect_result == 0 || errno == EINPROGRESS || errno == EWOULDBLOCK)
       << "Socket is not in listening state. Error: " << strerror(errno);
 
   // Clean up
@@ -53,4 +51,4 @@ TEST_F(ListeningSocketFixture, SocketIsListeningAfterInit) {
 }
 
 } // namespace test
-} // namespace flash
+} // namespace express

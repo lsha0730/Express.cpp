@@ -1,11 +1,11 @@
-#ifndef FLASH_URL_CODEC_H
-#define FLASH_URL_CODEC_H
+#ifndef EXPRESS_URL_CODEC_H
+#define EXPRESS_URL_CODEC_H
 
 #include <string>
 #include <string_view>
 #include <vector>
 
-namespace flash {
+namespace express {
 class UrlCodec {
 public:
   static std::string decode(std::string_view);
@@ -22,6 +22,6 @@ private:
   static std::string hex_to_utf8(const std::string &hex_str);
   static bool is_valid_hex_digit(char);
 };
-} // namespace flash
+} // namespace express
 
 #endif

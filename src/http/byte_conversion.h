@@ -1,11 +1,11 @@
-#ifndef FLASH_BYTE_CONVERSION
-#define FLASH_BYTE_CONVERSION
+#ifndef EXPRESS_BYTE_CONVERSION
+#define EXPRESS_BYTE_CONVERSION
 
+#include <express/concepts.h>
 #include <filesystem>
-#include <flash/concepts.h>
 #include <iterator>
 
-namespace flash {
+namespace express {
 template <BufferLike T> std::vector<char> to_bytes(const T &input) {
   const char *data_ptr = reinterpret_cast<const char *>(std::data(input));
   return std::vector<char>(data_ptr, data_ptr + std::size(input));
@@ -29,6 +29,6 @@ template <StringLike T> std::vector<char> to_bytes(const T &input) {
   }
   return data;
 }
-} // namespace flash
+} // namespace express
 
 #endif

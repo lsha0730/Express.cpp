@@ -1,9 +1,9 @@
-#ifndef FLASH_INTERNAL_TYPES_H
-#define FLASH_INTERNAL_TYPES_H
+#ifndef EXPRESS_INTERNAL_TYPES_H
+#define EXPRESS_INTERNAL_TYPES_H
 
 #include <functional>
 #include <string>
 
-namespace flash {} // namespace flash
+namespace express {} // namespace express
 
 #endif

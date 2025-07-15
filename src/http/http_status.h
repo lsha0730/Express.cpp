@@ -2,7 +2,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace flash {
+namespace express {
 class HttpStatus {
 public:
   static std::string get_message(int status_code) {
@@ -84,4 +84,4 @@ private:
       {510, "Not Extended"},
       {511, "Network Authentication Required"}};
 };
-}; // namespace flash
+}; // namespace express
